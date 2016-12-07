@@ -1,0 +1,27 @@
+package game
+import processing.core._
+
+
+object Window {
+  def main(args: Array[String]) {
+    PApplet.main(Array[String]("game.Window"))
+  }
+}
+
+class Window extends PApplet {
+  override def settings () {
+    size(200, 200)
+  }
+  
+  override def setup() {
+    background(0)
+    smooth()
+  }
+
+  override def draw() {
+    stroke(255)
+    if (mousePressed) {
+      line(mouseX,mouseY,pmouseX,pmouseY);
+    }
+  }
+}
