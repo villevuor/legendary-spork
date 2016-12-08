@@ -1,7 +1,6 @@
 package game
 
 import processing.core._
-import processing.sound._
 import scala.util.Random._
 import scala.collection.mutable.Buffer
 
@@ -16,8 +15,6 @@ class Window extends PApplet {
   private val game = new Game()
   
   private var gameStarted = false
-  
-  private var sound = new SoundFile(this, "game_music.mp3")
   
   var font: PFont = null
   
