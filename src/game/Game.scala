@@ -16,6 +16,11 @@ class Game {
   private var obstacles = Buffer[Obstacle]()
   private var dudePosition = 0
   
+  // "get methods" for vars
+  def isOn() = this.gameOn
+  def getScore() = this.score
+  def getDudePosition() = this.dudePosition
+  
   def startGame() = {   
     this.gameOn = true
     this.score = 0
@@ -26,19 +31,11 @@ class Game {
   
   def endGame() = this.gameOn = false
   
-  def isOn() = this.gameOn
-  
   def spacePressed() = this.normalGravity = !this.normalGravity
   
   def showHelp() = {
     println("help page requested")
   }
-  
-  def getScore() = this.score
-  
-  def getDudePosition() = this.dudePosition
-  
-  private def countScore() = score += 1
   
   def applyGravity() = {
     var positionChange = 0
@@ -50,6 +47,8 @@ class Game {
     }
     
     this.dudePosition += positionChange
+    
+    this.score += 1
     
     if ( this.dudePosition < 0 || this.dudePosition > this.windowHeight ) {
       this.endGame()

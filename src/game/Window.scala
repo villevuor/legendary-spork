@@ -1,7 +1,6 @@
 package game
 import processing.core._
 
-//LOL
 object Window {
   def main(args: Array[String]) {
     PApplet.main(Array[String]("game.Window"))
