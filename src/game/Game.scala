@@ -11,47 +11,57 @@ class Game {
   val blockSize = 20
   
   private var gameOn = false
+  private var helpOn = false
   private var score = 0
   private var normalGravity = true
   private var obstacles = Buffer[Obstacle]()
-  private var dudePosition = 0
+  private var taxiPosition = 0
   
   // "get methods" for vars
-  def isOn() = this.gameOn
+  def isOn = this.gameOn
+  def isHelp = this.helpOn
+  def isNormalGravity = this.normalGravity
   def getScore() = this.score
-  def getDudePosition() = this.dudePosition
+  def getTaxiPosition() = this.taxiPosition
   
-  def startGame() = {   
+  def startGame() = {  
     this.gameOn = true
+    this.helpOn = false
     this.score = 0
     this.normalGravity = true
     this.obstacles = Buffer[Obstacle]()
-    this.dudePosition = ( this.windowHeight / 2 ) - ( this.dudeSize / 2 )
+    this.taxiPosition = ( this.windowHeight / 2 ) - ( this.dudeSize / 2 )
   }
   
-  def endGame() = this.gameOn = false
+  // Ends help and current game
+  def showStartScreen() = {
+    this.gameOn = false
+    this.helpOn = false
+  }
   
   def spacePressed() = this.normalGravity = !this.normalGravity
   
-  def showHelp() = {
-    println("help page requested")
+  // Show help page or start screen
+  def toggleHelp() = {
+    this.gameOn = false
+    this.helpOn = !this.helpOn
   }
   
   def applyGravity() = {
     var positionChange = 0
     
     if ( this.normalGravity ) {
-      positionChange = 1
+      positionChange = 2
     } else {
-      positionChange = -1
+      positionChange = -2
     }
     
-    this.dudePosition += positionChange
+    this.taxiPosition += positionChange
     
     this.score += 1
     
-    if ( this.dudePosition < 0 || this.dudePosition > this.windowHeight ) {
-      this.endGame()
+    if ( this.taxiPosition < 0 || this.taxiPosition > this.windowHeight ) {
+      this.showStartScreen()
     }
   }
   
@@ -67,6 +77,11 @@ class Game {
     }
   }
   
+  def getHelpPage() = {
+    "Welcome to space taxi!\n\n" + 
+    "Wohoowohoo\n\n" + 
+    "Some more instructions"
+  }
   
   
   
