@@ -17,6 +17,7 @@ class Window extends PApplet {
   private var gameStarted = false
   
   var font: PFont = null
+  var taxi: PImage = null
   
   override def settings () = {
     size(game.windowWidth, game.windowHeight)
@@ -26,13 +27,14 @@ class Window extends PApplet {
     smooth()
     frameRate(60)
     this.font = createFont("assets/MOZART_0.ttf", 32)
+    this.taxi = loadImage("assets/taxi.png");
   }
   
   override def draw() = {
     background(0, 6, 23)
     drawBackground()
     
-    if ( game.isOn() ) {
+    if ( game.isOn ) {
       gameStarted = true
       gameScreen()
     } else { 
@@ -84,9 +86,23 @@ class Window extends PApplet {
   // Get dude position from game and draw it
   def drawDude() = {
     val coords = game.getDudePosition();
-    fill(255)
-    ellipse(20, coords, game.dudeSize, game.dudeSize);
+    
+    val taxi = this.taxi
+    
+    if ( this.game.isNormalGravity ) {
+      image( taxi, 30, coords )
+    } else {
+      this.flipImage( taxi, 30, coords )
+    } 
   }
+  
+  
+  def flipImage( img: PImage, x: Int, y: Int ) = {
+    pushMatrix()
+    scale( 1, -1 )
+    image( img, x, - y - img.height ) 
+    popMatrix()
+  } 
   
   // Loop through all the obstacles from Game class and draw them in right positions
   def drawObstacles() = {
@@ -112,8 +128,6 @@ class Window extends PApplet {
       val speed = scala.util.Random.nextInt(2) + 2
       this.stars += ( ( game.windowWidth, y.toInt, speed ) )
     }
-    
-    println( stars.size )
     
     // Move all stars 1 pixel to left and remove those out of window
     // star => ( x, y, speed )

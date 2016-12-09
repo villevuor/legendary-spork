@@ -17,7 +17,8 @@ class Game {
   private var dudePosition = 0
   
   // "get methods" for vars
-  def isOn() = this.gameOn
+  def isOn = this.gameOn
+  def isNormalGravity = this.normalGravity
   def getScore() = this.score
   def getDudePosition() = this.dudePosition
   
@@ -41,9 +42,9 @@ class Game {
     var positionChange = 0
     
     if ( this.normalGravity ) {
-      positionChange = 1
+      positionChange = 2
     } else {
-      positionChange = -1
+      positionChange = -2
     }
     
     this.dudePosition += positionChange
