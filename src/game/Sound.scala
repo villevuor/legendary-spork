@@ -5,11 +5,11 @@ import java.io.File
 
 class Sound(fileName: String) {
   
-  var file: File = new File(fileName)
+  val file: File = new File(fileName)
   
-  var sound: AudioInputStream = AudioSystem.getAudioInputStream(file)
+  val sound: AudioInputStream = AudioSystem.getAudioInputStream(file)
   
-  var clip: Clip = AudioSystem.getClip()
+  val clip: Clip = AudioSystem.getClip()
   
   clip.open(sound)
   
@@ -26,5 +26,6 @@ class Sound(fileName: String) {
   
   def stop() = {
     clip.stop()
+    clip.setFramePosition(0)
   }
 }
