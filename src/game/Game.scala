@@ -15,14 +15,14 @@ class Game {
   private var score = 0
   private var normalGravity = true
   private var obstacles = Buffer[Obstacle]()
-  private var dudePosition = 0
+  private var taxiPosition = 0
   
   // "get methods" for vars
   def isOn = this.gameOn
   def isHelp = this.helpOn
   def isNormalGravity = this.normalGravity
   def getScore() = this.score
-  def getDudePosition() = this.dudePosition
+  def getTaxiPosition() = this.taxiPosition
   
   def startGame() = {  
     this.gameOn = true
@@ -30,7 +30,7 @@ class Game {
     this.score = 0
     this.normalGravity = true
     this.obstacles = Buffer[Obstacle]()
-    this.dudePosition = ( this.windowHeight / 2 ) - ( this.dudeSize / 2 )
+    this.taxiPosition = ( this.windowHeight / 2 ) - ( this.dudeSize / 2 )
   }
   
   // Ends help and current game
@@ -56,11 +56,11 @@ class Game {
       positionChange = -2
     }
     
-    this.dudePosition += positionChange
+    this.taxiPosition += positionChange
     
     this.score += 1
     
-    if ( this.dudePosition < 0 || this.dudePosition > this.windowHeight ) {
+    if ( this.taxiPosition < 0 || this.taxiPosition > this.windowHeight ) {
       this.showStartScreen()
     }
   }

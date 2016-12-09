@@ -26,8 +26,9 @@ class Window extends PApplet {
   override def setup() = {
     smooth()
     frameRate(60)
+    frame.setTitle("")
     this.font = createFont("assets/MOZART_0.ttf", 32)
-    this.taxi = loadImage("assets/taxi.png");
+    this.taxi = loadImage("assets/taxi.png")
   }
   
   override def draw() = {
@@ -49,10 +50,9 @@ class Window extends PApplet {
   
   override def keyPressed() = {
     key match {
-      case '1' => game.startGame()
+      case ' ' => if ( game.isOn ) game.spacePressed() else game.startGame()
       case 'q' => game.showStartScreen() // ends game or hides help page
       case 'h' => game.toggleHelp()
-      case ' ' => game.spacePressed()
       case _  => {}
     }
   }
@@ -66,16 +66,16 @@ class Window extends PApplet {
     textSize(80)
     text("LEGENDARY SPORK", 40, game.windowHeight - 120)
     
-    textSize(50)
+    textSize(40)
     
     // Cool blinking text
     if ( ( frameCount / 30 ) % 2 == 0 ) { 
-      text("Press 1-3 to start", 40, game.windowHeight - 180)
+      text("Press SPACE to start", 40, game.windowHeight - 180)
     }
     
     // Display latest score
     if ( this.gameStarted ) {
-      text("Your latest score: " + game.getScore(), 40, game.windowHeight - 40)
+      text("Latest score: " + game.getScore(), this.game.windowWidth - 300, 35 )
     }
     
     textSize(30)
@@ -93,15 +93,15 @@ class Window extends PApplet {
     game.applyGravity()
     game.moveObstacles()
     
-    this.drawDude()
+    this.drawTaxi()
     this.drawObstacles()
     this.drawScore()
   }
   
   
-  // Get dude position from game and draw it
-  def drawDude() = {
-    val coords = game.getDudePosition();
+  // Get taxi position from game and draw it
+  def drawTaxi() = {
+    val coords = game.getTaxiPosition();
     
     val taxi = this.taxi
     
@@ -120,9 +120,10 @@ class Window extends PApplet {
   }
   
   def drawScore() = {
+    textSize(40)
     fill(245, 208, 0)
     // f"${X}%07d" adds front zeros
-    text( f"${ this.game.getScore() }%07d", this.game.windowWidth - 90, 30 )
+    text( f"${ this.game.getScore() }%07d", this.game.windowWidth - 120, 35 )
   }
   
   // Loop through all the obstacles from Game class and draw them in right positions
