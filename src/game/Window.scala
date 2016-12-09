@@ -80,6 +80,7 @@ class Window extends PApplet {
     
     this.drawDude()
     this.drawObstacles()
+    this.drawScore()
   }
   
   
@@ -102,7 +103,14 @@ class Window extends PApplet {
     scale( 1, -1 )
     image( img, x, - y - img.height ) 
     popMatrix()
-  } 
+  }
+  
+  def drawScore() = {
+    fill(245, 208, 0)
+    textAlign( 3, 3 )
+    // f"${X}%07d" adds front zeros
+    text( f"${ this.game.getScore() }%07d", this.game.windowWidth - 90, 30 )
+  }
   
   // Loop through all the obstacles from Game class and draw them in right positions
   def drawObstacles() = {
