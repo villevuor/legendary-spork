@@ -32,21 +32,26 @@ class Window extends PApplet {
   
   override def draw() = {
     background(0, 6, 23)
-    drawBackground()
     
-    if ( game.isOn ) {
-      gameStarted = true
-      gameScreen()
-    } else { 
-      initScreen()
+    if ( game.isHelp ) {
+      helpScreen()
+    } else {
+      drawBackground()
+      
+      if ( game.isOn ) {
+        gameStarted = true
+        gameScreen()
+      } else {
+        initScreen()
+      }
     }
   }
   
   override def keyPressed() = {
     key match {
       case '1' => game.startGame()
-      case '2' => game.showHelp()
-      case 'q' => game.endGame()
+      case 'q' => game.showStartScreen() // ends game or hides help page
+      case 'h' => game.toggleHelp()
       case ' ' => game.spacePressed()
       case _  => {}
     }
@@ -59,19 +64,29 @@ class Window extends PApplet {
     fill(245, 208, 0)
     
     textSize(80)
-    text("LEGENDARY SPORK", 40, game.windowHeight - 100)
+    text("LEGENDARY SPORK", 40, game.windowHeight - 120)
     
     textSize(50)
     
     // Cool blinking text
     if ( ( frameCount / 30 ) % 2 == 0 ) { 
-      text("Press 1 to start", 40, game.windowHeight - 160)
+      text("Press 1-3 to start", 40, game.windowHeight - 180)
     }
     
     // Display latest score
     if ( this.gameStarted ) {
       text("Your latest score: " + game.getScore(), 40, game.windowHeight - 40)
     }
+    
+    textSize(30)
+    text("Need help? Just press H", 40, game.windowHeight - 80)
+  }
+  
+  def helpScreen() = {
+    textSize(40)
+    text("INSTRUCTIONS", 40, 40)
+    textSize(30)
+    text( this.game.getHelpPage(), 40, 70)
   }
   
   def gameScreen() = {
@@ -97,7 +112,6 @@ class Window extends PApplet {
     } 
   }
   
-  
   def flipImage( img: PImage, x: Int, y: Int ) = {
     pushMatrix()
     scale( 1, -1 )
@@ -107,7 +121,6 @@ class Window extends PApplet {
   
   def drawScore() = {
     fill(245, 208, 0)
-    textAlign( 3, 3 )
     // f"${X}%07d" adds front zeros
     text( f"${ this.game.getScore() }%07d", this.game.windowWidth - 90, 30 )
   }
