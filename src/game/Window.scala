@@ -26,7 +26,7 @@ class Window extends PApplet {
   override def setup() = {
     smooth()
     frameRate(60)
-    frame.setTitle("")
+    surface.setTitle("")
     this.font = createFont("assets/MOZART_0.ttf", 32)
     this.taxi = loadImage("assets/taxi.png")
   }
