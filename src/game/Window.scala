@@ -2,6 +2,7 @@ package game
 
 import processing.core._
 import scala.util.Random._
+import javax.sound.sampled._
 import scala.collection.mutable.Buffer
 
 object Window {
@@ -17,6 +18,9 @@ class Window extends PApplet {
   private var gameStarted = false
   
   var font: PFont = null
+  
+  val gameMusic = new Sound("assets/game_music.wav")
+
   
   override def settings () = {
     size(game.windowWidth, game.windowHeight)
@@ -78,6 +82,7 @@ class Window extends PApplet {
     
     this.drawDude()
     this.drawObstacles()
+    this.gameMusic.loop()
   }
   
   
