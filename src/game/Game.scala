@@ -71,18 +71,15 @@ class Game {
     val taxiOutOfScreen = this.taxiPosition < - this.taxiHeight / 2 || this.taxiPosition > this.windowHeight - this.taxiHeight / 2
     
     var collision = false
-    var topLeft = (20, this.taxiPosition)
-    var topRight = (20 + this.taxiWidth, this.taxiPosition)
-    var botLeft = (20, this.taxiPosition + this.taxiHeight)
-    var botRight = (20 + this.taxiWidth, this.taxiPosition + this.taxiHeight)
+    var topLeft = (30, this.taxiPosition)
+    var topRight = (30 + this.taxiWidth, this.taxiPosition)
+    var botLeft = (30, this.taxiPosition + this.taxiHeight)
+    var botRight = (30 + this.taxiWidth, this.taxiPosition + this.taxiHeight)
       
         
     for (obstacle <- obstacles) {
       var coords = (obstacle.xCoord, obstacle.yCoord)
-      if ( isPixelWithinRectangle(topLeft, coords, this.taxiWidth, this.taxiHeight) || 
-           isPixelWithinRectangle(topRight, coords, this.taxiWidth, this.taxiHeight) ||
-           isPixelWithinRectangle(botLeft, coords, this.taxiWidth, this.taxiHeight) ||
-           isPixelWithinRectangle(botRight, coords, this.taxiWidth, this.taxiHeight ) ) {
+      if (isPixelWithinRectangle(topLeft, coords, this.taxiWidth, this.taxiHeight)) {
         collision = true
       }
     }
@@ -91,10 +88,10 @@ class Game {
   }
   
   def isPixelWithinRectangle(pixelToCheck: (Int, Int), rectanglePosition: (Int, Int), width: Int, height: Int): Boolean = {
-      if (rectanglePosition._1 > pixelToCheck._1 &&
-          rectanglePosition._1 < (pixelToCheck._1 + height) &&
-          rectanglePosition._2 > pixelToCheck._2 &&
-          rectanglePosition._2 < (pixelToCheck._2 + width)) { 
+      if (pixelToCheck._1 < rectanglePosition._1 &&
+          (pixelToCheck._1 + width) > rectanglePosition._1 &&
+          pixelToCheck._2 < rectanglePosition._2 &&
+          (pixelToCheck._2 + height) > rectanglePosition._2) { 
         true } else { false
      }
   }
