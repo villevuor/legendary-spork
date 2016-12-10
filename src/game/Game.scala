@@ -10,7 +10,7 @@ class Game {
   val windowWidth = 700
   val taxiWidth = 92
   val taxiHeight = 58
-  val blockSize = 20
+  val obstacleSize = 20
   
   private var gameOn = false
   private var helpOn = false
@@ -68,15 +68,35 @@ class Game {
     
     this.score += 1
     
-    if ( this.taxiPosition < - this.taxiHeight / 2 || this.taxiPosition > this.windowHeight - this.taxiHeight / 2 ) {
-      this.showStartScreen()
+    val taxiOutOfScreen = this.taxiPosition < - this.taxiHeight / 2 || this.taxiPosition > this.windowHeight - this.taxiHeight / 2
+    
+    var collision = false
+    var topLeft = (20, this.taxiPosition)
+    var topRight = (20 + this.taxiWidth, this.taxiPosition)
+    var botLeft = (20, this.taxiPosition + this.taxiHeight)
+    var botRight = (20 + this.taxiWidth, this.taxiPosition + this.taxiHeight)
+      
+        
+    for (obstacle <- obstacles) {
+      var coords = (obstacle.xCoord, obstacle.yCoord)
+      if ( isPixelWithinRectangle(topLeft, coords, this.taxiWidth, this.taxiHeight) || 
+           isPixelWithinRectangle(topRight, coords, this.taxiWidth, this.taxiHeight) ||
+           isPixelWithinRectangle(botLeft, coords, this.taxiWidth, this.taxiHeight) ||
+           isPixelWithinRectangle(botRight, coords, this.taxiWidth, this.taxiHeight ) ) {
+        collision = true
+      }
     }
+    
+    if ( taxiOutOfScreen || collision ) this.showStartScreen()
   }
   
-  def moveObstacles() = {
-    for ( obstacle <- this.obstacles ) {
-      obstacle.moveLeft()
-    }
+  def isPixelWithinRectangle(pixelToCheck: (Int, Int), rectanglePosition: (Int, Int), width: Int, height: Int): Boolean = {
+      if (rectanglePosition._1 > pixelToCheck._1 &&
+          rectanglePosition._1 < (pixelToCheck._1 + height) &&
+          rectanglePosition._2 > pixelToCheck._2 &&
+          rectanglePosition._2 < (pixelToCheck._2 + width)) { 
+        true } else { false
+     }
   }
   
   def getHelpPage() = {
