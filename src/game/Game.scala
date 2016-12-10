@@ -8,37 +8,47 @@ class Game {
   
   val windowHeight = 500
   val windowWidth = 700
-  val dudeSize = 30
+  val taxiWidth = 92
+  val taxiHeight = 58
   val blockSize = 20
   
   private var gameOn = false
+  private var helpOn = false
   private var score = 0
   private var normalGravity = true
-  private var obstacles = Buffer[Obstacle]()
-  private var dudePosition = 0
-  private var obstaclePosition = 700
+  private var obstacles = Buffer[Obstacle]()  
+  private var taxiPosition = 0 // upper left pixel of taxi
+
   
   // "get methods" for vars
-  def isOn() = this.gameOn
+  def isOn = this.gameOn
+  def isHelp = this.helpOn
+  def isNormalGravity = this.normalGravity
   def getScore() = this.score
-  def getDudePosition() = this.dudePosition
   def getObstacles() = this.obstacles
-  def getObstaclePosition = this.obstaclePosition
+  def getTaxiPosition() = this.taxiPosition
   
-  def startGame() = {   
+  def startGame() = {  
     this.gameOn = true
+    this.helpOn = false
     this.score = 0
     this.normalGravity = true
     this.obstacles = Buffer[Obstacle](new Obstacle(500,300))
-    this.dudePosition = ( this.windowHeight / 2 ) - ( this.dudeSize / 2 )
+    this.taxiPosition = ( this.windowHeight / 2 ) - this.taxiHeight
   }
   
-  def endGame() = this.gameOn = false
+  // Ends help and current game
+  def showStartScreen() = {
+    this.gameOn = false
+    this.helpOn = false
+  }
   
   def spacePressed() = this.normalGravity = !this.normalGravity
   
-  def showHelp() = {
-    println("help page requested")
+  // Show help page or start screen
+  def toggleHelp() = {
+    this.gameOn = false
+    this.helpOn = !this.helpOn
   }
   
   def moveElements() = {
@@ -47,20 +57,19 @@ class Game {
       obstacle.moveLeft()
     }
     
-    var positionChange = 0
+    var positionChange = 3
+
     
-    if ( this.normalGravity ) {
-      positionChange = 1
-    } else {
-      positionChange = -1
+    if ( !this.normalGravity ) {
+      positionChange *= -1
     }
     
-    this.dudePosition += positionChange
+    this.taxiPosition += positionChange
     
     this.score += 1
     
-    if ( this.dudePosition < 0 || this.dudePosition > this.windowHeight ) {
-      this.endGame()
+    if ( this.taxiPosition < - this.taxiHeight / 2 || this.taxiPosition > this.windowHeight - this.taxiHeight / 2 ) {
+      this.showStartScreen()
     }
   }
   
@@ -70,6 +79,11 @@ class Game {
     }
   }
   
+  def getHelpPage() = {
+    "Welcome to space taxi!\n\n" + 
+    "Wohoowohoo\n\n" + 
+    "Some more instructions"
+  }
   
   
   
