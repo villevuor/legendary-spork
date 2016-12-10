@@ -55,19 +55,21 @@ class Game {
   
   def moveElements() = {
     
+    // Move obstacles
     for ( obstacle <- this.obstacles ) {
       obstacle.moveLeft()
     }
+    // Filter out obstacles that are not in screen anymore
+    this.obstacles = this.obstacles.filter( _.getPosition()._1 + this.obstacleWidth >= 0 )
     
+    // Move taxi
     var positionChange = 3
-
-    
     if ( !this.normalGravity ) {
       positionChange *= -1
     }
-    
     this.taxiPositionY += positionChange
     
+    // Count score
     this.score += 1
     
     val taxiOutOfScreen = this.taxiPositionY < - this.taxiHeight / 2 || this.taxiPositionY > this.windowHeight - this.taxiHeight / 2
@@ -77,10 +79,10 @@ class Game {
     var topLeft = (this.taxiPositionX, this.taxiPositionY)
     var topRight = (this.taxiPositionX + this.taxiWidth, this.taxiPositionY)
     var botLeft = (this.taxiPositionX, this.taxiPositionY + this.taxiHeight)
-    var botRight = (this.taxiPositionX + this.taxiWidth, this.taxiPositionY + this.taxiHeight)
-        
+    var botRight = (this.taxiPositionX + this.taxiWidth, this.taxiPositionY + this.taxiHeight) 
+    
     for (obstacle <- obstacles) {
-      var coords = (obstacle.xCoord, obstacle.yCoord)
+      val coords = (obstacle.xCoord, obstacle.yCoord)
       if ( isPixelWithinRectangle(topLeft, coords, this.taxiWidth, this.taxiHeight) || 
            isPixelWithinRectangle(topRight, coords, this.taxiWidth, this.taxiHeight) ||
            isPixelWithinRectangle(botLeft, coords, this.taxiWidth, this.taxiHeight) ||
