@@ -24,6 +24,7 @@ class Window extends PApplet {
   private var fxOn = true
   private var musicOn = true
   val sounds = Buffer[Sound]()
+  //http://opengameart.org/content/512-sound-effects-8-bit-style
   val gameMusic = new Sound("assets/game_music.wav", false)
   val introMusic = new Sound("assets/intro_music.wav", false)
   sounds += gameMusic
