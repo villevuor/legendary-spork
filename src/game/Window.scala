@@ -156,7 +156,10 @@ class Window extends PApplet {
   }
   
   // Get taxi position from game and draw it
-  def drawTaxi() = image( this.taxi, game.getTaxiPosition()._1, game.getTaxiPosition()._2 ) 
+  def drawTaxi() = {
+    val ( taxiX, taxiY ) = game.getTaxiPosition()
+    image( this.taxi, taxiX, taxiY )
+  }
   
   def drawScore() = {
     textSize(40)
@@ -167,10 +170,9 @@ class Window extends PApplet {
   
   // Loop through all the obstacles from Game class and draw them in right positions
   def drawObstacles() = {
-    fill(255)
     for (obstacle <- game.getObstacles) {
-      val coords = obstacle.getPosition()
-      image( obstacle.image, coords._1, coords._2)
+      val (x, y) = obstacle.getPosition()
+      image( obstacle.image, x, y )
     }
   }
   

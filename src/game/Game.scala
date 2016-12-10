@@ -12,7 +12,7 @@ class Game {
   val taxiHeight = 58
   val obstacleWidth = 40
   val obstacleHeight = 45
-  val taxiPositionX = 30
+  val taxiPositionX = 20
   
   private var gameOn = false
   private var helpOn = false
@@ -69,33 +69,44 @@ class Game {
     }
     this.taxiPositionY += positionChange
     
-    // Count score
-    this.score += 1
-    
+    // End game if taxi is out of screen
     val taxiOutOfScreen = this.taxiPositionY < - this.taxiHeight / 2 || this.taxiPositionY > this.windowHeight - this.taxiHeight / 2
-    
     if ( taxiOutOfScreen ) this.showStartScreen()
    
-    var topLeft = (this.taxiPositionX, this.taxiPositionY)
-    var topRight = (this.taxiPositionX + this.taxiWidth, this.taxiPositionY)
-    var botLeft = (this.taxiPositionX, this.taxiPositionY + this.taxiHeight)
-    var botRight = (this.taxiPositionX + this.taxiWidth, this.taxiPositionY + this.taxiHeight) 
-    
+    // Check if taxi hits obstacle
     for (obstacle <- obstacles) {
-      val coords = (obstacle.xCoord, obstacle.yCoord)
-      if ( isPixelWithinRectangle(topLeft, coords, this.taxiWidth, this.taxiHeight) ) {
+      if ( taxiHitsObstacle( obstacle ) ) {
         obstacle.whenHit()
       }
     }
     
-    
+    // Count score
+    this.score += 1
   }
   
-  def isPixelWithinRectangle(pixelToCheck: (Int, Int), rectanglePosition: (Int, Int), width: Int, height: Int) = (
-    rectanglePosition._1 > pixelToCheck._1 &&
-    rectanglePosition._1 < ( pixelToCheck._1 + height ) &&
-    rectanglePosition._2 > pixelToCheck._2 &&
-    rectanglePosition._2 < ( pixelToCheck._2 + width )
+  def taxiHitsObstacle(obstacle: Obstacle) = {
+    val taxiPosition = this.getTaxiPosition()
+    val ( x, y ) = obstacle.getPosition()
+    
+    val obstacleBottomLeft = ( x, y )
+    val obstacleBottomRight = ( x + this.obstacleWidth, y )
+    val obstacleTopLeft = ( x, y + this.obstacleHeight )
+    val obstacleTopRight = ( x + this.obstacleWidth, y + this.obstacleHeight ) 
+    
+    // Obstacles are smaller than taxi so we don't have to think case "obstacle covers taxi"
+    (
+      pixelIsWithinRectangle( obstacleTopLeft, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
+      pixelIsWithinRectangle( obstacleTopRight, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
+      pixelIsWithinRectangle( obstacleBottomLeft, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
+      pixelIsWithinRectangle( obstacleBottomRight, taxiPosition, this.taxiWidth, this.taxiHeight )
+    )
+  }
+  
+  def pixelIsWithinRectangle(pixel: (Int, Int), rectanglePosition: (Int, Int), width: Int, height: Int) = (
+    pixel._1 > rectanglePosition._1 &&
+    pixel._1 < ( rectanglePosition._1 + width ) &&
+    pixel._2 > rectanglePosition._2 &&
+    pixel._2 < ( rectanglePosition._2 + height )
   )
   
   def createObstacles(frameCount: Int, orange: PImage, asteroid: PImage) = {
@@ -107,6 +118,7 @@ class Game {
       
       if ( scala.util.Random.nextFloat < 0.1 ) {
         image = orange 
+        action = () => this.score += 10000
         // action = () => this.changeMode() or something like that
       }
       
