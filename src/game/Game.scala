@@ -79,6 +79,8 @@ class Game {
         obstacle.whenHit()
       }
     }
+    // Filter out obstacles that hitted taxi
+    this.obstacles = this.obstacles.filterNot( taxiHitsObstacle( _ ) )
     
     // Count score
     this.score += 1
