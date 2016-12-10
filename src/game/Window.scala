@@ -19,6 +19,7 @@ class Window extends PApplet {
   var font: PFont = null
   var taxi: PImage = null
   var asteroid: PImage = null
+  var orange: PImage = null
   
   val gameMusic = new Sound("assets/game_music.wav")
   val introMusic = new Sound("assets/intro_music.wav")
@@ -35,6 +36,7 @@ class Window extends PApplet {
     this.font = createFont("assets/MOZART_0.ttf", 32)
     this.taxi = loadImage("assets/taxi.png")
     this.asteroid = loadImage("assets/asteroid.png") 
+    this.orange = loadImage("assets/orange.png") 
   }
   
   override def draw() = {
@@ -102,7 +104,7 @@ class Window extends PApplet {
     this.introMusic.stop()
     this.gameMusic.loop()
     
-    game.createObstacles( frameCount )
+    game.createObstacles( frameCount, this.orange, this.asteroid )
     game.moveElements()
     
     this.drawTaxi()
@@ -125,7 +127,7 @@ class Window extends PApplet {
     fill(255)
     for (obstacle <- game.getObstacles) {
       val coords = obstacle.getPosition()
-      image( this.asteroid, coords._1, coords._2)
+      image( obstacle.image, coords._1, coords._2)
     }
   }
   

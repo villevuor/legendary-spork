@@ -13,8 +13,6 @@ class Sound(fileName: String) {
   
   clip.open(sound)
   
-  
-  
   def play() = {
     clip.setFramePosition(0)
     clip.start()
