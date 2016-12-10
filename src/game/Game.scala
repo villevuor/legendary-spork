@@ -7,7 +7,8 @@ class Game {
   
   val windowHeight = 500
   val windowWidth = 700
-  val dudeSize = 30
+  val taxiWidth = 92
+  val taxiHeight = 58
   val blockSize = 20
   
   private var gameOn = false
@@ -15,7 +16,7 @@ class Game {
   private var score = 0
   private var normalGravity = true
   private var obstacles = Buffer[Obstacle]()
-  private var taxiPosition = 0
+  private var taxiPosition = 0 // upper left pixel of taxi
   
   // "get methods" for vars
   def isOn = this.gameOn
@@ -30,7 +31,7 @@ class Game {
     this.score = 0
     this.normalGravity = true
     this.obstacles = Buffer[Obstacle]()
-    this.taxiPosition = ( this.windowHeight / 2 ) - ( this.dudeSize / 2 )
+    this.taxiPosition = ( this.windowHeight / 2 ) - this.taxiHeight
   }
   
   // Ends help and current game
@@ -60,7 +61,7 @@ class Game {
     
     this.score += 1
     
-    if ( this.taxiPosition < 0 || this.taxiPosition > this.windowHeight ) {
+    if ( this.taxiPosition < - this.taxiHeight / 2 || this.taxiPosition > this.windowHeight - this.taxiHeight / 2 ) {
       this.showStartScreen()
     }
   }
