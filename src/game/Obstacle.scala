@@ -7,6 +7,6 @@ class Obstacle(xCoordStart: Int, yCoordStart: Int) {
  
   def getPosition() = (this.xCoord, this.yCoord)
   
-  def moveLeft() = this.xCoord -= 1
+  def moveLeft() = this.xCoord -= 2
   
 }

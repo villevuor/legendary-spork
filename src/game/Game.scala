@@ -10,7 +10,7 @@ class Game {
   val windowWidth = 700
   val taxiWidth = 92
   val taxiHeight = 58
-  val blockSize = 20
+  val blockSize = 45
   
   private var gameOn = false
   private var helpOn = false
@@ -76,6 +76,13 @@ class Game {
   def moveObstacles() = {
     for ( obstacle <- this.obstacles ) {
       obstacle.moveLeft()
+    }
+  }
+  
+  def createObstacles(frameCount: Int) = {
+    if ( frameCount % 150 == 0 ) {
+      val y = this.windowHeight * scala.util.Random.nextFloat
+      this.obstacles += new Obstacle( this.windowWidth, y.toInt )
     }
   }
   

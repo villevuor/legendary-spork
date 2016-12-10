@@ -18,6 +18,7 @@ class Window extends PApplet {
   
   var font: PFont = null
   var taxi: PImage = null
+  var asteroid: PImage = null
   
   val gameMusic = new Sound("assets/game_music.wav")
   val introMusic = new Sound("assets/intro_music.wav")
@@ -33,6 +34,7 @@ class Window extends PApplet {
     surface.setTitle("")
     this.font = createFont("assets/MOZART_0.ttf", 32)
     this.taxi = loadImage("assets/taxi.png")
+    this.asteroid = loadImage("assets/asteroid.png") 
   }
   
   override def draw() = {
@@ -71,7 +73,7 @@ class Window extends PApplet {
     fill(245, 208, 0)
     
     textSize(80)
-    text("LEGENDARY SPORK", 40, game.windowHeight - 120)
+    text("LEGENDARY SPACE TAXI", 40, game.windowHeight - 120)
     
     textSize(40)
     
@@ -100,6 +102,7 @@ class Window extends PApplet {
     this.introMusic.stop()
     this.gameMusic.loop()
     
+    game.createObstacles( frameCount )
     game.moveElements()
     
     this.drawTaxi()
@@ -119,10 +122,10 @@ class Window extends PApplet {
   
   // Loop through all the obstacles from Game class and draw them in right positions
   def drawObstacles() = {
-    fill(0)
+    fill(255)
     for (obstacle <- game.getObstacles) {
       val coords = obstacle.getPosition()
-      rect(coords._1, coords._2, 50, 50)
+      image( this.asteroid, coords._1, coords._2)
     }
   }
   
