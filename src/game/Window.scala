@@ -142,7 +142,7 @@ class Window extends PApplet {
   }
   
   // Get taxi position from game and draw it
-  def drawTaxi() = image( this.taxi, 30, game.getTaxiPosition() ) 
+  def drawTaxi() = image( this.taxi, game.getTaxiPosition()._1, game.getTaxiPosition()._2 ) 
   
   def drawScore() = {
     textSize(40)
