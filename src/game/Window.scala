@@ -1,5 +1,6 @@
 package game
 import processing.core._
+import scala.util.Random
 
 object Window {
   def main(args: Array[String]) {
@@ -55,11 +56,10 @@ class Window extends PApplet {
   def gameScreen() = {
     background(236, 240, 241);
     
-    game.applyGravity()
-    game.moveObstacles()
+    game.moveElements()
     
     this.drawDude()
-    this.drawObstacles()
+    this.drawSpikes()
   }
   
   
@@ -71,7 +71,11 @@ class Window extends PApplet {
   }
   
   // Loop through all the obstacles from Game class and draw them in right positions
-  def drawObstacles() = {
-    
+  def drawSpikes() = {
+    fill(0)
+    for (obstacle <- game.getObstacles) {
+      val coords = obstacle.getPosition()
+      rect(coords._1, coords._2, 50, 50)
+    }
   }
 }

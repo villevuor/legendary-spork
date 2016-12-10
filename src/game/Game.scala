@@ -2,6 +2,7 @@ package game
 
 import processing.core._
 import scala.collection.mutable.Buffer
+import scala.util.Random
 
 class Game {
   
@@ -15,17 +16,20 @@ class Game {
   private var normalGravity = true
   private var obstacles = Buffer[Obstacle]()
   private var dudePosition = 0
+  private var obstaclePosition = 700
   
   // "get methods" for vars
   def isOn() = this.gameOn
   def getScore() = this.score
   def getDudePosition() = this.dudePosition
+  def getObstacles() = this.obstacles
+  def getObstaclePosition = this.obstaclePosition
   
   def startGame() = {   
     this.gameOn = true
     this.score = 0
     this.normalGravity = true
-    this.obstacles = Buffer[Obstacle]()
+    this.obstacles = Buffer[Obstacle](new Obstacle(500,300))
     this.dudePosition = ( this.windowHeight / 2 ) - ( this.dudeSize / 2 )
   }
   
@@ -37,7 +41,12 @@ class Game {
     println("help page requested")
   }
   
-  def applyGravity() = {
+  def moveElements() = {
+    
+    for ( obstacle <- this.obstacles ) {
+      obstacle.moveLeft()
+    }
+    
     var positionChange = 0
     
     if ( this.normalGravity ) {
@@ -55,13 +64,7 @@ class Game {
     }
   }
   
-  def createObstacles() = {
-    // Creates obstacles to right
-    // this.obstacles += XXX
-  }
-  
   def moveObstacles() = {
-    // Moves obstacles from right to left
     for ( obstacle <- this.obstacles ) {
       obstacle.moveLeft()
     }
