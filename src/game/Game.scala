@@ -49,12 +49,10 @@ class Game {
   }
   
   def applyGravity() = {
-    var positionChange = 0
+    var positionChange = 3
     
-    if ( this.normalGravity ) {
-      positionChange = 2
-    } else {
-      positionChange = -2
+    if ( !this.normalGravity ) {
+      positionChange *= -1
     }
     
     this.taxiPosition += positionChange
