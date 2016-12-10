@@ -115,18 +115,7 @@ class Window extends PApplet {
     
     val taxi = this.taxi
     
-    if ( this.game.isNormalGravity ) {
-      image( taxi, 30, coords )
-    } else {
-      this.flipImage( taxi, 30, coords )
-    } 
-  }
-  
-  def flipImage( img: PImage, x: Int, y: Int ) = {
-    pushMatrix()
-    scale( 1, -1 )
-    image( img, x, - y - img.height ) 
-    popMatrix()
+    image( taxi, 30, coords ) 
   }
   
   def drawScore() = {
