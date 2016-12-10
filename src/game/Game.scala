@@ -10,14 +10,16 @@ class Game {
   val windowWidth = 700
   val taxiWidth = 92
   val taxiHeight = 58
-  val obstacleSize = 20
+  val obstacleWidth = 40
+  val obstacleHeight = 45
+  val taxiPositionX = 30
   
   private var gameOn = false
   private var helpOn = false
   private var score = 0
   private var normalGravity = true
-  private var obstacles = Buffer[Obstacle]()  
-  private var taxiPosition = 0 // upper left pixel of taxi
+  private var obstacles = Buffer[Obstacle]()
+  private var taxiPositionY = 0 // upper left pixel of taxi
 
   
   // "get methods" for vars
@@ -26,7 +28,7 @@ class Game {
   def isNormalGravity = this.normalGravity
   def getScore() = this.score
   def getObstacles() = this.obstacles
-  def getTaxiPosition() = this.taxiPosition
+  def getTaxiPosition() = (this.taxiPositionX, this.taxiPositionY)
   
   def startGame() = {  
     this.gameOn = true
@@ -34,7 +36,7 @@ class Game {
     this.score = 0
     this.normalGravity = true
     this.obstacles = Buffer[Obstacle]()
-    this.taxiPosition = ( this.windowHeight / 2 ) - this.taxiHeight
+    this.taxiPositionY = ( this.windowHeight / 2 ) - this.taxiHeight
   }
   
   // Ends help and current game
@@ -64,17 +66,17 @@ class Game {
       positionChange *= -1
     }
     
-    this.taxiPosition += positionChange
+    this.taxiPositionY += positionChange
     
     this.score += 1
     
-    val taxiOutOfScreen = this.taxiPosition < - this.taxiHeight / 2 || this.taxiPosition > this.windowHeight - this.taxiHeight / 2
+    val taxiOutOfScreen = this.taxiPositionY < - this.taxiHeight / 2 || this.taxiPositionY > this.windowHeight - this.taxiHeight / 2
     
     var collision = false
-    var topLeft = (30, this.taxiPosition)
-    var topRight = (30 + this.taxiWidth, this.taxiPosition)
-    var botLeft = (30, this.taxiPosition + this.taxiHeight)
-    var botRight = (30 + this.taxiWidth, this.taxiPosition + this.taxiHeight)
+    var topLeft = (this.taxiPositionX, this.taxiPositionY)
+    var topRight = (this.taxiPositionX + this.taxiWidth, this.taxiPositionY)
+    var botLeft = (this.taxiPositionX, this.taxiPositionY + this.taxiHeight)
+    var botRight = (this.taxiPositionX + this.taxiWidth, this.taxiPositionY + this.taxiHeight)
       
         
     for (obstacle <- obstacles) {
@@ -84,7 +86,7 @@ class Game {
       }
     }
     
-    if ( taxiOutOfScreen || collision ) this.showStartScreen()
+    if (taxiOutOfScreen || collision) gameOn = false
   }
   
   def isPixelWithinRectangle(pixelToCheck: (Int, Int), rectanglePosition: (Int, Int), width: Int, height: Int): Boolean = {
@@ -117,7 +119,5 @@ class Game {
     "Wohoowohoo\n\n" + 
     "Some more instructions"
   }
-  
-  
   
 }
