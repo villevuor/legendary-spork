@@ -92,14 +92,12 @@ class Game {
     
   }
   
-  def isPixelWithinRectangle(pixelToCheck: (Int, Int), rectanglePosition: (Int, Int), width: Int, height: Int): Boolean = {
-      if (rectanglePosition._1 > pixelToCheck._1 &&
-          rectanglePosition._1 < (pixelToCheck._1 + height) &&
-          rectanglePosition._2 > pixelToCheck._2 &&
-          rectanglePosition._2 < (pixelToCheck._2 + width)) { 
-        true } else { false
-     }
-  }
+  def isPixelWithinRectangle(pixelToCheck: (Int, Int), rectanglePosition: (Int, Int), width: Int, height: Int) = (
+    rectanglePosition._1 > pixelToCheck._1 &&
+    rectanglePosition._1 < ( pixelToCheck._1 + height ) &&
+    rectanglePosition._2 > pixelToCheck._2 &&
+    rectanglePosition._2 < ( pixelToCheck._2 + width )
+  )
   
   def createObstacles(frameCount: Int, orange: PImage, asteroid: PImage) = {
     if ( frameCount % 150 == 0 ) {
