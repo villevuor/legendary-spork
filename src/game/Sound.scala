@@ -3,7 +3,9 @@ package game
 import javax.sound.sampled._
 import java.io.File
 
-class Sound(fileName: String) {
+class Sound(fileName: String, val fx: Boolean) {
+  
+  private var muted = false
   
   val file: File = new File(fileName)
   
@@ -13,15 +15,26 @@ class Sound(fileName: String) {
   
   clip.open(sound)
   
+  def mute() = {
+    this.muted = true
+    clip.stop()
+  }
   
-  
+  def unMute() = {
+    this.muted = false
+  }
+
   def play() = {
-    clip.setFramePosition(0)
-    clip.start()
+    if (!muted) {
+      clip.setFramePosition(0)
+      clip.start()
+    }
   }
   
   def loop() = {
+    if (!muted) {
     clip.loop(Clip.LOOP_CONTINUOUSLY)
+    }
   }
   
   def stop() = {

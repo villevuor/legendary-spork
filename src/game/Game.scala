@@ -33,7 +33,7 @@ class Game {
     this.helpOn = false
     this.score = 0
     this.normalGravity = true
-    this.obstacles = Buffer[Obstacle](new Obstacle(500,300))
+    this.obstacles = Buffer[Obstacle]()
     this.taxiPosition = ( this.windowHeight / 2 ) - this.taxiHeight
   }
   
@@ -97,6 +97,22 @@ class Game {
           rectanglePosition._2 < (pixelToCheck._2 + width)) { 
         true } else { false
      }
+  }
+  
+  def createObstacles(frameCount: Int, orange: PImage, asteroid: PImage) = {
+    if ( frameCount % 150 == 0 ) {
+      val y = this.windowHeight * scala.util.Random.nextFloat
+      
+      var image = asteroid
+      var action = () => this.showStartScreen()
+      
+      if ( scala.util.Random.nextFloat < 0.1 ) {
+        image = orange 
+        // action = () => this.changeMode() or something like that
+      }
+      
+      this.obstacles += new Obstacle( this.windowWidth, y.toInt, image, action )
+    }
   }
   
   def getHelpPage() = {

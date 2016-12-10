@@ -18,10 +18,39 @@ class Window extends PApplet {
   
   var font: PFont = null
   var taxi: PImage = null
+  var asteroid: PImage = null
+  var orange: PImage = null
   
-  val gameMusic = new Sound("assets/game_music.wav")
-  val introMusic = new Sound("assets/intro_music.wav")
-
+  private var fxOn = true
+  private var musicOn = true
+  val sounds = Buffer[Sound]()
+  //http://opengameart.org/content/512-sound-effects-8-bit-style
+  val gameMusic = new Sound("assets/game_music.wav", false)
+  val introMusic = new Sound("assets/intro_music.wav", false)
+  sounds += gameMusic
+  sounds += introMusic
+  
+  def toggleMusic() = {
+    if (musicOn) {
+       sounds.filter(!_.fx).foreach( _.mute() ) 
+       musicOn = false
+    }
+    else {
+      sounds.filter(!_.fx).foreach( _.unMute() )
+      musicOn = true
+    }
+  }
+  
+  def toggleFx() = {
+    if (fxOn) {
+      sounds.filter(_.fx).foreach( _.mute() )
+      fxOn = false
+    }
+    else {
+      sounds.filter(_.fx).foreach( _.unMute() )
+      fxOn = true
+    }
+  }
   
   override def settings () = {
     size(game.windowWidth, game.windowHeight)
@@ -33,6 +62,8 @@ class Window extends PApplet {
     surface.setTitle("")
     this.font = createFont("assets/MOZART_0.ttf", 32)
     this.taxi = loadImage("assets/taxi.png")
+    this.asteroid = loadImage("assets/asteroid.png") 
+    this.orange = loadImage("assets/orange.png") 
   }
   
   override def draw() = {
@@ -57,6 +88,8 @@ class Window extends PApplet {
       case ' ' => if ( game.isOn ) game.spacePressed() else game.startGame()
       case 'q' => game.showStartScreen() // ends game or hides help page
       case 'h' => game.toggleHelp()
+      case 'm' => this.toggleMusic()
+      case 'f' => this.toggleFx()
       case _  => {}
     }
   }
@@ -71,7 +104,7 @@ class Window extends PApplet {
     fill(245, 208, 0)
     
     textSize(80)
-    text("LEGENDARY SPORK", 40, game.windowHeight - 120)
+    text("LEGENDARY SPACE TAXI", 40, game.windowHeight - 120)
     
     textSize(40)
     
@@ -100,6 +133,7 @@ class Window extends PApplet {
     this.introMusic.stop()
     this.gameMusic.loop()
     
+    game.createObstacles( frameCount, this.orange, this.asteroid )
     game.moveElements()
     
     this.drawTaxi()
@@ -119,10 +153,10 @@ class Window extends PApplet {
   
   // Loop through all the obstacles from Game class and draw them in right positions
   def drawObstacles() = {
-    fill(0)
+    fill(255)
     for (obstacle <- game.getObstacles) {
       val coords = obstacle.getPosition()
-      rect(coords._1, coords._2, 50, 50)
+      image( obstacle.image, coords._1, coords._2)
     }
   }
   
