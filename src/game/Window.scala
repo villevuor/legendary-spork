@@ -19,9 +19,35 @@ class Window extends PApplet {
   var font: PFont = null
   var taxi: PImage = null
   
-  val gameMusic = new Sound("assets/game_music.wav")
-  val introMusic = new Sound("assets/intro_music.wav")
-
+  private var fxOn = true
+  private var musicOn = true
+  val sounds = Buffer[Sound]()
+  val gameMusic = new Sound("assets/game_music.wav", false)
+  val introMusic = new Sound("assets/intro_music.wav", false)
+  sounds += gameMusic
+  sounds += introMusic
+  
+  def toggleMusic() = {
+    if (musicOn) {
+       sounds.filter(!_.fx).foreach( _.mute() ) 
+       musicOn = false
+    }
+    else {
+      sounds.filter(!_.fx).foreach( _.unMute() )
+      musicOn = true
+    }
+  }
+  
+  def toggleFx() = {
+    if (fxOn) {
+      sounds.filter(_.fx).foreach( _.mute() )
+      fxOn = false
+    }
+    else {
+      sounds.filter(_.fx).foreach( _.unMute() )
+      fxOn = true
+    }
+  }
   
   override def settings () = {
     size(game.windowWidth, game.windowHeight)
@@ -57,6 +83,8 @@ class Window extends PApplet {
       case ' ' => if ( game.isOn ) game.spacePressed() else game.startGame()
       case 'q' => game.showStartScreen() // ends game or hides help page
       case 'h' => game.toggleHelp()
+      case 'm' => this.toggleMusic()
+      case 'f' => this.toggleFx()
       case _  => {}
     }
   }
