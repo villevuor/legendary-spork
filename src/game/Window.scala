@@ -27,8 +27,10 @@ class Window extends PApplet {
   //http://opengameart.org/content/512-sound-effects-8-bit-style
   val gameMusic = new Sound("assets/game_music.wav", false)
   val introMusic = new Sound("assets/intro_music.wav", false)
+  val commandFx = new Sound("assets/sfx_button.wav", true)
   sounds += gameMusic
   sounds += introMusic
+  sounds += commandFx
   
   def toggleMusic() = {
     if (musicOn) {
@@ -86,10 +88,22 @@ class Window extends PApplet {
   override def keyPressed() = {
     key match {
       case ' ' => if ( game.isOn ) game.spacePressed() else game.startGame()
-      case 'q' => game.showStartScreen() // ends game or hides help page
-      case 'h' => game.toggleHelp()
-      case 'm' => this.toggleMusic()
-      case 'f' => this.toggleFx()
+      case 'q' => {
+        game.showStartScreen() // ends game or hides help page
+        commandFx.play()
+      }
+      case 'h' => {
+        game.toggleHelp()
+        commandFx.play()
+      }
+      case 'm' => {
+        this.toggleMusic()
+        commandFx.play()
+      }
+      case 'f' => {
+        this.toggleFx()
+        commandFx.play()
+      }
       case _  => {}
     }
   }

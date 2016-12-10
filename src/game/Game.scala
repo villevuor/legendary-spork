@@ -83,10 +83,7 @@ class Game {
     
     for (obstacle <- obstacles) {
       val coords = (obstacle.xCoord, obstacle.yCoord)
-      if ( isPixelWithinRectangle(topLeft, coords, this.taxiWidth, this.taxiHeight) || 
-           isPixelWithinRectangle(topRight, coords, this.taxiWidth, this.taxiHeight) ||
-           isPixelWithinRectangle(botLeft, coords, this.taxiWidth, this.taxiHeight) ||
-           isPixelWithinRectangle(botRight, coords, this.taxiWidth, this.taxiHeight ) ) {
+      if ( isPixelWithinRectangle(topLeft, coords, this.taxiWidth, this.taxiHeight) ) {
         obstacle.whenHit()
       }
     }
