@@ -166,11 +166,13 @@ class Window extends PApplet {
     textSize(40)
     text("You got " + this.game.getScore() + " points!", half, 250)
     
-    fill(255)
-    textSize(25)
-    text("Press SPACE to start a new game", half, 310)
-    text("Press Q to show the start screen", half, 335)
-    text("Press H for help", half, 360)
+    if ( this.game.canStartNewGame ) {
+      fill(255)
+      textSize(25)
+      text("Press SPACE to start a new game", half, 310)
+      text("Press Q to show the start screen", half, 335)
+      text("Press H for help", half, 360)
+    }
   }
   
   def gameScreen() = {

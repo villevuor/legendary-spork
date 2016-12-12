@@ -50,7 +50,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   def endGame(): Unit = {
     this.gameOn = false
     this.gameOver = true
-    this.canStartNewGameTime = Some( 2.seconds.fromNow )
+    this.canStartNewGameTime = Some( 1.seconds.fromNow )
   }
   
   // Shows start screen
