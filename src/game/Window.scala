@@ -75,20 +75,14 @@ class Window extends PApplet {
   }
   
   override def draw() = {
-    background(0, 6, 23)
-    
-    if ( game.isHelp ) {
+    if ( this.game.isHelp ) {
       this.helpScreen()
+    } else if ( this.game.isOn ) {
+      this.gameScreen()
+    } else if ( this.game.isOver ) {
+      this.gameOverScreen()
     } else {
-      this.drawBackground()
-      
-      if ( this.game.isOn ) {
-        this.gameScreen()
-      } else if ( this.game.isOver ) {
-        this.gameOverScreen()
-      } else {
-        this.initScreen()
-      }
+      this.initScreen()
     }
   }
   
@@ -122,6 +116,7 @@ class Window extends PApplet {
   }
   
   def initScreen() = {
+    this.drawBackground()
     
     this.gameMusic.stop()
     this.introMusic.loop()
@@ -146,6 +141,8 @@ class Window extends PApplet {
   }
   
   def helpScreen() = {
+    this.drawBackground()
+    
     textAlign(1) // left
     fill(245, 208, 0)
     textSize(40)
@@ -156,6 +153,8 @@ class Window extends PApplet {
   }
   
   def gameOverScreen() = {
+    this.drawBackground()
+    
     val half = this.windowWidth / 2
     
     fill(245, 208, 0)
@@ -176,6 +175,16 @@ class Window extends PApplet {
   }
   
   def gameScreen() = {
+    this.game.getCurrentLevel() match {
+      case 1 => background(0, 6, 23)
+      case 2 => background(9, 18, 42)
+      case 3 => background(31, 38, 59)
+      case 4 => background(57, 60, 69)
+      case 5 => background(11, 6, 23)
+    }
+    
+    this.drawBackground()
+    
     this.introMusic.stop()
     this.gameMusic.loop()
     
@@ -216,23 +225,28 @@ class Window extends PApplet {
   // Draw background stars
   def drawBackground() = {
     
-    val size = 4
-    
-    fill(255)
-    
-    for ( star <- stars ) {
-      rect(star._1, star._2, size, size)
+    if ( !this.game.isOn ) {
+      background(0, 6, 23)
     }
     
-    if ( frameCount % 20 == 0 ) {
-      val y = game.windowHeight * Random.nextFloat
-      val speed = Random.nextInt(2) + 2
-      this.stars += ( ( game.windowWidth, y.toInt, speed ) )
+    if ( !this.game.isHelp ) {
+      val size = 4
+      fill(255)
+      
+      for ( star <- stars ) {
+        rect(star._1, star._2, size, size)
+      }
+      
+      if ( frameCount % 20 == 0 ) {
+        val y = game.windowHeight * Random.nextFloat
+        val speed = Random.nextInt(2) + 2
+        this.stars += ( ( game.windowWidth, y.toInt, speed ) )
+      }
+      
+      // Move all stars 1 pixel to left and remove those out of window
+      // star => ( x, y, speed )
+      this.stars = this.stars.map(star => ( star._1 - star._3, star._2, star._3 ) )
+      this.stars = this.stars.filter( _._1 > -size )
     }
-    
-    // Move all stars 1 pixel to left and remove those out of window
-    // star => ( x, y, speed )
-    this.stars = this.stars.map(star => ( star._1 - star._3, star._2, star._3 ) )
-    this.stars = this.stars.filter( _._1 > -size )
   }
 }
