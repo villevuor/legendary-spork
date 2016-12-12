@@ -4,10 +4,12 @@ import processing.core._
 import scala.collection.mutable.Buffer
 import scala.util.Random
 
-class Game {
+// Game class takes care of creating game objects, calculating their positions
+// and possible collisions between game elements. It also counts score and handles
+// help page content.
+
+class Game(val windowWidth: Int, val windowHeight: Int) {
   
-  val windowHeight = 500
-  val windowWidth = 700
   val taxiWidth = 92
   val taxiHeight = 58
   val obstacleWidth = 40
@@ -29,7 +31,7 @@ class Game {
   def getObstacles() = this.obstacles
   def getTaxiPosition() = (this.taxiPositionX, this.taxiPositionY)
   
-  def startGame() = {  
+  def startGame(): Unit = {  
     this.gameOn = true
     this.helpOn = false
     this.score = 0
@@ -39,21 +41,22 @@ class Game {
   }
   
   // Ends help and current game
-  def showStartScreen() = {
+  def showStartScreen(): Unit = {
     this.gameOn = false
     this.helpOn = false
   }
   
-  def spacePressed() = this.normalGravity = !this.normalGravity
+  // Pressing space changes gravity
+  def changeGravity(): Unit = this.normalGravity = !this.normalGravity
   
   // Show help page or start screen
-  def toggleHelp() = {
+  def toggleHelp(): Unit = {
     this.gameOn = false
     this.helpOn = !this.helpOn
   }
   
   // Method for moving all the game elements (taxi + obstacles)
-  def moveElements() = {
+  def moveElements(): Unit = {
     // Move obstacles
     for ( obstacle <- this.obstacles ) {
       obstacle.moveLeft()
@@ -81,7 +84,8 @@ class Game {
     this.score += 1
   }
   
-  private def taxiHitsObstacle(obstacle: Obstacle) = {
+  // Helper method fot checking taxi hits obstacle
+  private def taxiHitsObstacle(obstacle: Obstacle): Boolean = {
     val taxiPosition = this.getTaxiPosition()
     val ( x, y ) = obstacle.getPosition()
     
@@ -99,21 +103,28 @@ class Game {
     )
   }
   
-  private def pixelIsWithinRectangle(pixel: (Int, Int), rectanglePosition: (Int, Int), width: Int, height: Int) = (
+  // General helper method for checking "is pixel within rectangle"
+  private def pixelIsWithinRectangle(pixel: (Int, Int), rectanglePosition: (Int, Int), rectangleWidth: Int, rectangleHeight: Int): Boolean = (
     pixel._1 > rectanglePosition._1 &&
-    pixel._1 < ( rectanglePosition._1 + width ) &&
+    pixel._1 < ( rectanglePosition._1 + rectangleWidth ) &&
     pixel._2 > rectanglePosition._2 &&
-    pixel._2 < ( rectanglePosition._2 + height )
+    pixel._2 < ( rectanglePosition._2 + rectangleHeight )
   )
   
-  def createObstacles(frameCount: Int, orange: PImage, asteroid: PImage) = {
-    if ( frameCount % 150 == 0 ) {
-      val y = this.windowHeight * scala.util.Random.nextFloat
+  // Method that creates obstacles
+  def createObstacles(frameCount: Int, orange: PImage, asteroid: PImage): Unit = {
+    
+    // Obstacles are created every 2 seconds, but sometimes every 1 second
+    val create = ( frameCount % 120 == 0 || ( frameCount % 60 == 0 && Random.nextFloat < 0.3 ) )
+    
+    if ( create ) {
+      val y = ( this.windowHeight * Random.nextFloat ) - ( this.obstacleHeight / 2 )
       
       var image = asteroid
       var action = () => this.showStartScreen()
       
-      if ( scala.util.Random.nextFloat < 0.1 ) {
+      // Every 10th (average) obstacle is orange
+      if ( Random.nextFloat < 0.1 ) {
         image = orange 
         action = () => this.score += 10000
         // action = () => this.changeMode() or something like that
@@ -123,7 +134,7 @@ class Game {
     }
   }
   
-  def getHelpPage() = {
+  def getHelpPage(): String = {
     "Welcome to space taxi!\n\n" + 
     "Wohoowohoo\n\n" + 
     "Some more instructions"

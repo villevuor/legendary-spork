@@ -1,8 +1,10 @@
 package game
 
 import processing.core._
-import scala.util.Random._
+import scala.util.Random
 import scala.collection.mutable.Buffer
+
+// This actually starts program and draws window
 
 object Window {
   def main(args: Array[String]) {
@@ -10,9 +12,15 @@ object Window {
   }
 }
 
+// Class Window draws game graphics and forwards key press events to Game class.
+// It also fetches game element positions from Game class.
+
 class Window extends PApplet {
   
-  private val game = new Game()
+  private val windowHeight = 500
+  private val windowWidth = 700
+  
+  private val game = new Game(windowWidth, windowHeight)
   
   private var gameStarted = false
   
@@ -87,7 +95,7 @@ class Window extends PApplet {
   
   override def keyPressed() = {
     key match {
-      case ' ' => if ( game.isOn ) game.spacePressed() else game.startGame()
+      case ' ' => if ( game.isOn ) game.changeGravity() else game.startGame()
       case 'q' => {
         game.showStartScreen() // ends game or hides help page
         commandFx.play()
@@ -118,22 +126,22 @@ class Window extends PApplet {
     fill(245, 208, 0)
     
     textSize(80)
-    text("LEGENDARY SPACE TAXI", 40, game.windowHeight - 120)
+    text("LEGENDARY SPACE TAXI", 40, this.windowHeight - 120)
     
     textSize(40)
     
     // Cool blinking text
     if ( ( frameCount / 30 ) % 2 == 0 ) { 
-      text("Press SPACE to start", 40, game.windowHeight - 180)
+      text("Press SPACE to start", 40, this.windowHeight - 180)
     }
     
     // Display latest score
     if ( this.gameStarted ) {
-      text("Latest score: " + game.getScore(), this.game.windowWidth - 300, 35 )
+      text("Latest score: " + this.game.getScore(), this.windowWidth - 300, 35 )
     }
     
     textSize(30)
-    text("Need help? Just press H", 40, game.windowHeight - 80)
+    text("Need help? Just press H", 40, this.windowHeight - 80)
   }
   
   def helpScreen() = {
@@ -147,8 +155,8 @@ class Window extends PApplet {
     this.introMusic.stop()
     this.gameMusic.loop()
     
-    game.createObstacles( frameCount, this.orange, this.asteroid )
-    game.moveElements()
+    this.game.createObstacles( frameCount, this.orange, this.asteroid )
+    this.game.moveElements()
     
     this.drawTaxi()
     this.drawObstacles()
@@ -176,28 +184,31 @@ class Window extends PApplet {
     }
   }
   
-  // Background artefacts
+  // Background artefacts ("stars"). These are created in Window since they have
+  // nothing to do with game elements – they are made just for cooler appearance.
+ 
   private var stars = Buffer[(Int, Int, Int)]() // (x, y, speed)
   
-  // Draw background artefacts
+  // Draw background stars
   def drawBackground() = {
     
-    val s = 4
+    val size = 4
     
     fill(255)
     
     for ( star <- stars ) {
-      rect(star._1, star._2, s, s)
+      rect(star._1, star._2, size, size)
     }
     
     if ( frameCount % 20 == 0 ) {
-      val y = game.windowHeight * scala.util.Random.nextFloat
-      val speed = scala.util.Random.nextInt(2) + 2
+      val y = game.windowHeight * Random.nextFloat
+      val speed = Random.nextInt(2) + 2
       this.stars += ( ( game.windowWidth, y.toInt, speed ) )
     }
     
     // Move all stars 1 pixel to left and remove those out of window
     // star => ( x, y, speed )
-    this.stars = stars.map( star => ( star._1 - star._3, star._2, star._3 ) ).filter( _._1 > -s )
+    this.stars = this.stars.map(star => ( star._1 - star._3, star._2, star._3 ) )
+    this.stars = this.stars.filter( _._1 > -size )
   }
 }
