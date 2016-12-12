@@ -168,9 +168,14 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   }
   
   def getHelpPage(): String = {
-    "Welcome to space taxi!\n\n" + 
-    "Wohoowohoo\n\n" + 
-    "Some more instructions"
+    "\n\nWelcome to the legendary journey of the space bus!\n" +
+    "How long can you travel without hitting the asteroids?\n" +
+    "Oranges will send you to another dimension.\n\n" +
+    "CONTROLS:\n\n" + 
+    "SPACE: control the space bus\n" +
+    "Q: quit to start screen\n" +
+    "M: mute sound\n" +
+    "F: mute FX"
   }
   
 }

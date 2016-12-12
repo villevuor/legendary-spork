@@ -35,9 +35,13 @@ class Window extends PApplet {
   val gameMusic = new Sound("assets/game_music.wav", false)
   val introMusic = new Sound("assets/intro_music.wav", false)
   val commandFx = new Sound("assets/sfx_button.wav", true)
+  val startFx = new Sound("assets/sfx_poweron.wav", true)
+  val loseFx = new Sound("assets/sfx_fall.wav", true)
   sounds += gameMusic
   sounds += introMusic
   sounds += commandFx
+  sounds += startFx
+  sounds += loseFx
   
   def toggleMusic() = {
     if (musicOn) {
@@ -97,6 +101,7 @@ class Window extends PApplet {
           this.game.changeGravity()
         } else if ( this.game.canStartNewGame ) { 
           this.game.startGame()
+          this.startFx.play()
         }
       }
       case 'q' => {
@@ -129,7 +134,7 @@ class Window extends PApplet {
     textAlign(1) // left
     
     textSize(80)
-    text("LEGENDARY SPACE TAXI", 40, this.windowHeight - 120)
+    text("LEGENDARY SPACE BUS", 40, this.windowHeight - 120)
     
     textSize(40)
     
@@ -143,6 +148,10 @@ class Window extends PApplet {
   }
   
   def helpScreen() = {
+    
+    this.gameMusic.stop()
+    this.introMusic.loop()
+    
     textAlign(1) // left
     fill(245, 208, 0)
     textSize(40)
@@ -154,6 +163,10 @@ class Window extends PApplet {
   
   def gameOverScreen() = {    
     val half = this.windowWidth / 2
+    
+    this.loseFx.lose()
+    this.gameMusic.stop()
+    this.introMusic.loop()
     
     fill(245, 208, 0)
     textAlign(3) // center
@@ -175,6 +188,7 @@ class Window extends PApplet {
   def gameScreen() = {
     this.introMusic.stop()
     this.gameMusic.loop()
+    this.loseFx.rewind()
     
     this.game.createObstacles( frameCount, this.orange, this.asteroid )
     this.game.moveElements()
