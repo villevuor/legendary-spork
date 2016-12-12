@@ -25,16 +25,17 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   private var normalGravity = true
   private var obstacles = Buffer[Obstacle]()
   private var taxiPositionY = 0 // upper left pixel of taxi
-
-  // "get methods" for vars
+  private var currentLevel = 1
+  
   def isOn = this.gameOn
   def isOver = this.gameOver
   def isHelp = this.helpOn
   def isNormalGravity = this.normalGravity
+  def canStartNewGame = ( this.canStartNewGameTime == None || this.canStartNewGameTime.get.timeLeft < 0.seconds )
+  def getCurrentLevel() = this.currentLevel
   def getScore() = this.score
   def getObstacles() = this.obstacles
   def getTaxiPosition() = ( this.taxiPositionX, this.taxiPositionY )
-  def canStartNewGame = ( this.canStartNewGameTime == None || this.canStartNewGameTime.get.timeLeft < 0.seconds )
   
   def startGame(): Unit = {  
     this.gameOn = true
@@ -44,6 +45,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     this.normalGravity = true
     this.obstacles = Buffer[Obstacle]()
     this.taxiPositionY = ( this.windowHeight / 2 ) - this.taxiHeight
+    this.currentLevel = 1
   }
   
   // Ends help and current game
