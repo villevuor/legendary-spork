@@ -21,7 +21,6 @@ class Game {
   private var obstacles = Buffer[Obstacle]()
   private var taxiPositionY = 0 // upper left pixel of taxi
 
-  
   // "get methods" for vars
   def isOn = this.gameOn
   def isHelp = this.helpOn
@@ -53,8 +52,8 @@ class Game {
     this.helpOn = !this.helpOn
   }
   
+  // Method for moving all the game elements (taxi + obstacles)
   def moveElements() = {
-    
     // Move obstacles
     for ( obstacle <- this.obstacles ) {
       obstacle.moveLeft()
@@ -74,19 +73,15 @@ class Game {
     if ( taxiOutOfScreen ) this.showStartScreen()
    
     // Check if taxi hits obstacle
-    for (obstacle <- obstacles) {
-      if ( taxiHitsObstacle( obstacle ) ) {
-        obstacle.whenHit()
-      }
-    }
+    this.obstacles.foreach( obstacle => if ( this.taxiHitsObstacle( obstacle ) ) obstacle.whenHit() )
     // Filter out obstacles that hitted taxi
-    this.obstacles = this.obstacles.filterNot( taxiHitsObstacle( _ ) )
+    this.obstacles = this.obstacles.filterNot( this.taxiHitsObstacle( _ ) )
     
     // Count score
     this.score += 1
   }
   
-  def taxiHitsObstacle(obstacle: Obstacle) = {
+  private def taxiHitsObstacle(obstacle: Obstacle) = {
     val taxiPosition = this.getTaxiPosition()
     val ( x, y ) = obstacle.getPosition()
     
@@ -97,14 +92,14 @@ class Game {
     
     // Obstacles are smaller than taxi so we don't have to think case "obstacle covers taxi"
     (
-      pixelIsWithinRectangle( obstacleTopLeft, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
-      pixelIsWithinRectangle( obstacleTopRight, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
-      pixelIsWithinRectangle( obstacleBottomLeft, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
-      pixelIsWithinRectangle( obstacleBottomRight, taxiPosition, this.taxiWidth, this.taxiHeight )
+      this.pixelIsWithinRectangle( obstacleTopLeft, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
+      this.pixelIsWithinRectangle( obstacleTopRight, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
+      this.pixelIsWithinRectangle( obstacleBottomLeft, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
+      this.pixelIsWithinRectangle( obstacleBottomRight, taxiPosition, this.taxiWidth, this.taxiHeight )
     )
   }
   
-  def pixelIsWithinRectangle(pixel: (Int, Int), rectanglePosition: (Int, Int), width: Int, height: Int) = (
+  private def pixelIsWithinRectangle(pixel: (Int, Int), rectanglePosition: (Int, Int), width: Int, height: Int) = (
     pixel._1 > rectanglePosition._1 &&
     pixel._1 < ( rectanglePosition._1 + width ) &&
     pixel._2 > rectanglePosition._2 &&
