@@ -22,8 +22,6 @@ class Window extends PApplet {
   
   private val game = new Game(windowWidth, windowHeight)
   
-  private var gameStarted = false
-  
   var font: PFont = null
   var taxi: PImage = null
   var asteroid: PImage = null
@@ -80,28 +78,35 @@ class Window extends PApplet {
     background(0, 6, 23)
     
     if ( game.isHelp ) {
-      helpScreen()
+      this.helpScreen()
     } else {
-      drawBackground()
+      this.drawBackground()
       
-      if ( game.isOn ) {
-        gameStarted = true
-        gameScreen()
+      if ( this.game.isOn ) {
+        this.gameScreen()
+      } else if ( this.game.isOver ) {
+        this.gameOverScreen()
       } else {
-        initScreen()
+        this.initScreen()
       }
     }
   }
   
   override def keyPressed() = {
     key match {
-      case ' ' => if ( game.isOn ) game.changeGravity() else game.startGame()
+      case ' ' => {
+        if ( this.game.isOn ) {
+          this.game.changeGravity()
+        } else if ( this.game.canStartNewGame ) { 
+          this.game.startGame()
+        }
+      }
       case 'q' => {
-        game.showStartScreen() // ends game or hides help page
+        this.game.showStartScreen() // ends game or hides help page
         commandFx.play()
       }
       case 'h' => {
-        game.toggleHelp()
+        this.game.toggleHelp()
         commandFx.play()
       }
       case 'm' => {
@@ -121,9 +126,10 @@ class Window extends PApplet {
     this.gameMusic.stop()
     this.introMusic.loop()
     
-    textFont(this.font, 32);
+    textFont(this.font, 32)
     
     fill(245, 208, 0)
+    textAlign(1) // left
     
     textSize(80)
     text("LEGENDARY SPACE TAXI", 40, this.windowHeight - 120)
@@ -135,20 +141,36 @@ class Window extends PApplet {
       text("Press SPACE to start", 40, this.windowHeight - 180)
     }
     
-    // Display latest score
-    if ( this.gameStarted ) {
-      text("Latest score: " + this.game.getScore(), this.windowWidth - 300, 35 )
-    }
-    
     textSize(30)
     text("Need help? Just press H", 40, this.windowHeight - 80)
   }
   
   def helpScreen() = {
+    textAlign(1) // left
+    fill(245, 208, 0)
     textSize(40)
     text("INSTRUCTIONS", 40, 40)
+    fill(255)
     textSize(30)
     text( this.game.getHelpPage(), 40, 70)
+  }
+  
+  def gameOverScreen() = {
+    val half = this.windowWidth / 2
+    
+    fill(245, 208, 0)
+    textAlign(3) // center
+    
+    textSize(80)
+    text("GAME OVER", half, 200)
+    textSize(40)
+    text("You got " + this.game.getScore() + " points!", half, 250)
+    
+    fill(255)
+    textSize(25)
+    text("Press SPACE to start a new game", half, 310)
+    text("Press Q to show the start screen", half, 335)
+    text("Press H for help", half, 360)
   }
   
   def gameScreen() = {

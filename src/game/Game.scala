@@ -3,6 +3,7 @@ package game
 import processing.core._
 import scala.collection.mutable.Buffer
 import scala.util.Random
+import scala.concurrent.duration._
 
 // Game class takes care of creating game objects, calculating their positions
 // and possible collisions between game elements. It also counts score and handles
@@ -17,6 +18,8 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   val taxiPositionX = 20
   
   private var gameOn = false
+  private var gameOver = false
+  private var canStartNewGameTime: Option[Deadline] = None 
   private var helpOn = false
   private var score = 0
   private var normalGravity = true
@@ -25,14 +28,17 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
 
   // "get methods" for vars
   def isOn = this.gameOn
+  def isOver = this.gameOver
   def isHelp = this.helpOn
   def isNormalGravity = this.normalGravity
   def getScore() = this.score
   def getObstacles() = this.obstacles
-  def getTaxiPosition() = (this.taxiPositionX, this.taxiPositionY)
+  def getTaxiPosition() = ( this.taxiPositionX, this.taxiPositionY )
+  def canStartNewGame = ( this.canStartNewGameTime == None || this.canStartNewGameTime.get.timeLeft < 0.seconds )
   
   def startGame(): Unit = {  
     this.gameOn = true
+    this.gameOver = false
     this.helpOn = false
     this.score = 0
     this.normalGravity = true
@@ -41,8 +47,16 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   }
   
   // Ends help and current game
+  def endGame(): Unit = {
+    this.gameOn = false
+    this.gameOver = true
+    this.canStartNewGameTime = Some( 2.seconds.fromNow )
+  }
+  
+  // Shows start screen
   def showStartScreen(): Unit = {
     this.gameOn = false
+    this.gameOver = false
     this.helpOn = false
   }
   
@@ -73,7 +87,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     
     // End game if taxi is out of screen
     val taxiOutOfScreen = this.taxiPositionY < - this.taxiHeight / 2 || this.taxiPositionY > this.windowHeight - this.taxiHeight / 2
-    if ( taxiOutOfScreen ) this.showStartScreen()
+    if ( taxiOutOfScreen ) this.endGame()
    
     // Check if taxi hits obstacle
     this.obstacles.foreach( obstacle => if ( this.taxiHitsObstacle( obstacle ) ) obstacle.whenHit() )
@@ -121,7 +135,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
       val y = ( this.windowHeight * Random.nextFloat ) - ( this.obstacleHeight / 2 )
       
       var image = asteroid
-      var action = () => this.showStartScreen()
+      var action = () => this.endGame()
       
       // Every 10th (average) obstacle is orange
       if ( Random.nextFloat < 0.1 ) {
