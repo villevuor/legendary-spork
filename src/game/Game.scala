@@ -206,7 +206,9 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   def createObstacles(frameCount: Int, orange: PImage, asteroid: PImage): Unit = {
     
     // Obstacles are created every 2 seconds and sometimes every 1 second
-    //val create = ( frameCount % 120 == 0 || ( frameCount % 60 == 0 && Random.nextFloat < 0.3 ) )
+    
+    //TÄÄ YLIMÄÄRÄNEN?? val create = ( frameCount % 120 == 0 || ( frameCount % 60 == 0 && Random.nextFloat < 0.3 ) )
+    
     // Every 4 seconds the interval between objects is shortened by one second, caps at four objects per second.
     // In addition there's a 20% chance once a second to create an additional object. The chances of creating a random object
     // increase by 0.01 every three seconds, capping at one additional object per second. To sum it up, after three minutes of gameplay
