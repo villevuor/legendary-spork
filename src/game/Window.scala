@@ -28,43 +28,6 @@ class Window extends PApplet {
   var orange: PImage = null
   var bonus: PImage = null
   
-  private var fxOn = true
-  private var musicOn = true
-  val sounds = Buffer[Sound]()
-  //http://opengameart.org/content/512-sound-effects-8-bit-style
-  val gameMusic = new Sound("assets/game_music.wav", false)
-  val introMusic = new Sound("assets/intro_music.wav", false)
-  val commandFx = new Sound("assets/sfx_button.wav", true)
-  val startFx = new Sound("assets/sfx_poweron.wav", true)
-  val loseFx = new Sound("assets/sfx_fall.wav", true)
-  sounds += gameMusic
-  sounds += introMusic
-  sounds += commandFx
-  sounds += startFx
-  sounds += loseFx
-  
-  def toggleMusic() = {
-    if (musicOn) {
-       sounds.filter(!_.fx).foreach( _.mute() ) 
-       musicOn = false
-    }
-    else {
-      sounds.filter(!_.fx).foreach( _.unMute() )
-      musicOn = true
-    }
-  }
-  
-  def toggleFx() = {
-    if (fxOn) {
-      sounds.filter(_.fx).foreach( _.mute() )
-      fxOn = false
-    }
-    else {
-      sounds.filter(_.fx).foreach( _.unMute() )
-      fxOn = true
-    }
-  }
-  
   override def settings () = {
     size(game.windowWidth, game.windowHeight)
   }
@@ -101,32 +64,30 @@ class Window extends PApplet {
           this.game.changeGravity()
         } else if ( this.game.canStartNewGame ) { 
           this.game.startGame()
-          this.startFx.play()
         }
       }
       case 'q' => {
         this.game.showStartScreen() // ends game or hides help page
-        commandFx.play()
+        game.commandFx.play()
       }
       case 'h' => {
         this.game.toggleHelp()
-        commandFx.play()
+        game.commandFx.play()
       }
       case 'm' => {
-        this.toggleMusic()
-        commandFx.play()
+        game.toggleMusic()
+        game.commandFx.play()
       }
       case 'f' => {
-        this.toggleFx()
-        commandFx.play()
+        game.toggleFx()
+        game.commandFx.play()
       }
       case _  => {}
     }
   }
   
   def initScreen() = {    
-    this.gameMusic.stop()
-    this.introMusic.loop()
+    game.introMusic.loop()
     
     textFont(this.font, 32)
     
@@ -149,8 +110,8 @@ class Window extends PApplet {
   
   def helpScreen() = {
     
-    this.gameMusic.stop()
-    this.introMusic.loop()
+    game.gameMusic.stop()
+    game.introMusic.loop()
     
     textAlign(1) // left
     fill(245, 208, 0)
@@ -164,9 +125,8 @@ class Window extends PApplet {
   def gameOverScreen() = {    
     val half = this.windowWidth / 2
     
-    this.loseFx.lose()
-    this.gameMusic.stop()
-    this.introMusic.loop()
+    game.gameMusic.stop()
+    game.introMusic.loop()
     
     fill(245, 208, 0)
     textAlign(3) // center
@@ -186,9 +146,8 @@ class Window extends PApplet {
   }
   
   def gameScreen() = {
-    this.introMusic.stop()
-    this.gameMusic.loop()
-    this.loseFx.rewind()
+    game.introMusic.stop()
+    game.gameMusic.loop()
     
     this.game.createObstacles( frameCount, this.orange, this.asteroid )
     this.game.moveElements()
@@ -230,7 +189,7 @@ class Window extends PApplet {
   // nothing to do with game elements – they are made just for cooler appearance.
  
   private var stars = Buffer[(Int, Int, Int)]() // (x, y, speed)
-  
+
   // Draw background stars
   def drawBackground() = {
     

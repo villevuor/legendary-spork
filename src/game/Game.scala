@@ -29,6 +29,51 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   private var currentLevel = 1
   private var specialMode = 0
   
+  private var fxOn = true
+  private var musicOn = true
+  val sounds = Buffer[Sound]()
+  
+  // All the sounds are imported...
+  val gameMusic = new Sound("assets/game_music.wav", false)
+  val introMusic = new Sound("assets/intro_music.wav", false)
+  val commandFx = new Sound("assets/sfx_button.wav", true)
+  val startFx = new Sound("assets/sfx_poweron.wav", true)
+  val loseFx = new Sound("assets/sfx_fall.wav", true)
+  val modeFx = new Sound("assets/sfx_powerup.wav", true)
+  val moneyFx = new Sound("assets/sfx_coin.wav", true)
+  //  ...and saved into a buffer
+  sounds += gameMusic
+  sounds += introMusic
+  sounds += commandFx
+  sounds += startFx
+  sounds += loseFx
+  sounds += modeFx
+  sounds += moneyFx
+  
+  // Toggles the music on and off
+  def toggleMusic() = {
+    if (musicOn) {
+       sounds.filter(!_.fx).foreach( _.mute() ) // Mutes all the sounds that are categorized as music
+       musicOn = false
+    }
+    else {
+      sounds.filter(!_.fx).foreach( _.unMute() ) // Unmutes
+      musicOn = true
+    }
+  }
+  
+  // Toggles the sound effects on and off
+  def toggleFx() = {
+    if (fxOn) {
+      sounds.filter(_.fx).foreach( _.mute() ) // Mutes all the sounds that are categorized as effects
+      fxOn = false
+    }
+    else {
+      sounds.filter(_.fx).foreach( _.unMute() ) // Unmutes
+      fxOn = true
+    }
+  }
+  
   def isOn = this.gameOn
   def isOver = this.gameOver
   def isHelp = this.helpOn
@@ -50,6 +95,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     this.taxiPositionY = ( this.windowHeight / 2 ) - this.taxiHeight
     this.currentLevel = 1
     this.specialMode = 0
+    this.startFx.play()
   }
   
   // Ends help and current game
@@ -58,6 +104,8 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     this.gameOver = true
     this.canStartNewGameTime = Some( 1.seconds.fromNow )
     this.specialMode = 0
+    
+    this.loseFx.play()
   }
   
   // Shows start screen
@@ -92,7 +140,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     }
     this.taxiPositionY += positionChange
     
-    // End game if taxi is out of screen
+    // Ends game if taxi is out of screen
     val taxiOutOfScreen = this.taxiPositionY < - this.taxiHeight / 2 || this.taxiPositionY > this.windowHeight - this.taxiHeight / 2
     if ( taxiOutOfScreen ) this.endGame()
    
@@ -101,8 +149,9 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
       if ( this.taxiHitsObstacle( obstacle ) ) {
         if ( this.isSpecialMode ) {
           this.score += 1000
+          this.moneyFx.play()
         } else {
-          obstacle.whenHit()
+            obstacle.whenHit()
         }
       }
     })
@@ -118,7 +167,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     }
   }
   
-  // Helper method fot checking taxi hits obstacle
+  // Helper method for checking taxi hits obstacle
   private def taxiHitsObstacle(obstacle: Obstacle): Boolean = {
     val taxiPosition = this.getTaxiPosition()
     val ( x, y ) = obstacle.getPosition()
@@ -128,7 +177,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     val obstacleTopLeft = ( x, y + this.obstacleHeight )
     val obstacleTopRight = ( x + this.obstacleWidth, y + this.obstacleHeight ) 
     
-    // Obstacles are smaller than taxi so we don't have to think case "obstacle covers taxi"
+    // Obstacles are smaller than taxi so we don't have to think about the case "obstacle covers taxi"
     (
       this.pixelIsWithinRectangle( obstacleTopLeft, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
       this.pixelIsWithinRectangle( obstacleTopRight, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
@@ -148,7 +197,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   // Method that creates obstacles
   def createObstacles(frameCount: Int, orange: PImage, asteroid: PImage): Unit = {
     
-    // Obstacles are created every 2 seconds, but sometimes every 1 second
+    // Obstacles are created every 2 seconds and sometimes every 1 second
     val create = ( frameCount % 120 == 0 || ( frameCount % 60 == 0 && Random.nextFloat < 0.3 ) )
     
     if ( create ) {
@@ -160,7 +209,10 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
       // Every 10th obstacle is orange (average)
       if ( Random.nextFloat < 0.1 ) {
         image = orange 
-        action = () => this.specialMode = 900 // 15 seconds of specialmode
+        action = () => {
+          this.specialMode = 900 // 15 seconds of special mode
+          this.modeFx.play()
+        }
       }
       
       this.obstacles += new Obstacle( this.windowWidth, y.toInt, image, action )
@@ -168,14 +220,15 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   }
   
   def getHelpPage(): String = {
-    "\n\nWelcome to the legendary journey of the space bus!\n" +
+    "\nWelcome to the legendary journey of the space bus!\n" +
     "How long can you travel without hitting the asteroids?\n" +
     "Oranges will send you to another dimension.\n\n" +
     "CONTROLS:\n\n" + 
     "SPACE: control the space bus\n" +
     "Q: quit to start screen\n" +
     "M: mute sound\n" +
-    "F: mute FX"
+    "F: mute FX\n\n" + 
+    "Sound effects from:\nopengameart.org/content/512-sound-effects-8-bit-style"
   }
   
 }
