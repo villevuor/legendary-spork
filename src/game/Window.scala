@@ -26,6 +26,7 @@ class Window extends PApplet {
   var taxi: PImage = null
   var asteroid: PImage = null
   var orange: PImage = null
+  var bonus: PImage = null
   
   private var fxOn = true
   private var musicOn = true
@@ -34,9 +35,13 @@ class Window extends PApplet {
   val gameMusic = new Sound("assets/game_music.wav", false)
   val introMusic = new Sound("assets/intro_music.wav", false)
   val commandFx = new Sound("assets/sfx_button.wav", true)
+  val startFx = new Sound("assets/sfx_poweron.wav", true)
+  val loseFx = new Sound("assets/sfx_fall.wav", true)
   sounds += gameMusic
   sounds += introMusic
   sounds += commandFx
+  sounds += startFx
+  sounds += loseFx
   
   def toggleMusic() = {
     if (musicOn) {
@@ -69,26 +74,23 @@ class Window extends PApplet {
     frameRate(60)
     surface.setTitle("")
     this.font = createFont("assets/MOZART_0.ttf", 32)
-    this.taxi = loadImage("assets/taxi.png")
+    this.taxi = loadImage("assets/bus.png")
     this.asteroid = loadImage("assets/asteroid.png") 
-    this.orange = loadImage("assets/orange.png") 
+    this.orange = loadImage("assets/orange.png")
+    this.bonus = loadImage("assets/bonuspoints.png")
   }
   
   override def draw() = {
-    background(0, 6, 23)
+    this.drawBackground()
     
-    if ( game.isHelp ) {
+    if ( this.game.isHelp ) {
       this.helpScreen()
+    } else if ( this.game.isOn ) {
+      this.gameScreen()
+    } else if ( this.game.isOver ) {
+      this.gameOverScreen()
     } else {
-      this.drawBackground()
-      
-      if ( this.game.isOn ) {
-        this.gameScreen()
-      } else if ( this.game.isOver ) {
-        this.gameOverScreen()
-      } else {
-        this.initScreen()
-      }
+      this.initScreen()
     }
   }
   
@@ -98,7 +100,12 @@ class Window extends PApplet {
         if ( this.game.isOn ) {
           this.game.changeGravity()
         } else if ( this.game.canStartNewGame ) { 
+<<<<<<< HEAD
           this.game.startGame(frameCount)
+=======
+          this.game.startGame()
+          this.startFx.play()
+>>>>>>> origin/master
         }
       }
       case 'q' => {
@@ -121,8 +128,7 @@ class Window extends PApplet {
     }
   }
   
-  def initScreen() = {
-    
+  def initScreen() = {    
     this.gameMusic.stop()
     this.introMusic.loop()
     
@@ -132,7 +138,7 @@ class Window extends PApplet {
     textAlign(1) // left
     
     textSize(80)
-    text("LEGENDARY SPACE TAXI", 40, this.windowHeight - 120)
+    text("LEGENDARY SPACE BUS", 40, this.windowHeight - 120)
     
     textSize(40)
     
@@ -146,6 +152,10 @@ class Window extends PApplet {
   }
   
   def helpScreen() = {
+    
+    this.gameMusic.stop()
+    this.introMusic.loop()
+    
     textAlign(1) // left
     fill(245, 208, 0)
     textSize(40)
@@ -155,8 +165,12 @@ class Window extends PApplet {
     text( this.game.getHelpPage(), 40, 70)
   }
   
-  def gameOverScreen() = {
+  def gameOverScreen() = {    
     val half = this.windowWidth / 2
+    
+    this.loseFx.lose()
+    this.gameMusic.stop()
+    this.introMusic.loop()
     
     fill(245, 208, 0)
     textAlign(3) // center
@@ -178,6 +192,7 @@ class Window extends PApplet {
   def gameScreen() = {
     this.introMusic.stop()
     this.gameMusic.loop()
+    this.loseFx.rewind()
     
     this.game.createObstacles( frameCount, this.orange, this.asteroid )
     this.game.moveElements()
@@ -195,16 +210,23 @@ class Window extends PApplet {
   
   def drawScore() = {
     textSize(40)
-    fill(245, 208, 0)
+    
+    if ( this.game.isSpecialMode ) {
+      fill(0)
+    } else {
+      fill(245, 208, 0)
+    }
+    
     // f"${X}%07d" adds front zeros
     text( f"${ this.game.getScore() }%07d", this.game.windowWidth - 120, 35 )
   }
   
   // Loop through all the obstacles from Game class and draw them in right positions
   def drawObstacles() = {
-    for (obstacle <- game.getObstacles) {
+    for (obstacle <- this.game.getObstacles) {
       val (x, y) = obstacle.getPosition()
-      image( obstacle.image, x, y )
+      val img = if ( this.game.isSpecialMode ) bonus else obstacle.image
+      image( img, x, y )
     }
   }
   
@@ -216,23 +238,37 @@ class Window extends PApplet {
   // Draw background stars
   def drawBackground() = {
     
-    val size = 4
-    
-    fill(255)
-    
-    for ( star <- stars ) {
-      rect(star._1, star._2, size, size)
+    if ( this.game.isSpecialMode ) {
+      background(255, 203, 253)
+    } else {
+      background(0, 6, 23)
     }
-    
-    if ( frameCount % 20 == 0 ) {
-      val y = game.windowHeight * Random.nextFloat
-      val speed = Random.nextInt(2) + 2
-      this.stars += ( ( game.windowWidth, y.toInt, speed ) )
+
+    if ( !this.game.isHelp ) {
+      val size = 4
+      
+      noStroke()
+      
+      if ( this.game.isSpecialMode ) {
+        fill(119, 9, 115)
+      } else {
+        fill(255)
+      }
+      
+      for ( star <- stars ) {
+        rect(star._1, star._2, size, size)
+      }
+      
+      if ( frameCount % 20 == 0 ) {
+        val y = game.windowHeight * Random.nextFloat
+        val speed = Random.nextInt(2) + 2
+        this.stars += ( ( game.windowWidth, y.toInt, speed ) )
+      }
+      
+      // Move all stars 1 pixel to left and remove those out of window
+      // star => ( x, y, speed )
+      this.stars = this.stars.map(star => ( star._1 - star._3, star._2, star._3 ) )
+      this.stars = this.stars.filter( _._1 > -size )
     }
-    
-    // Move all stars 1 pixel to left and remove those out of window
-    // star => ( x, y, speed )
-    this.stars = this.stars.map(star => ( star._1 - star._3, star._2, star._3 ) )
-    this.stars = this.stars.filter( _._1 > -size )
   }
 }

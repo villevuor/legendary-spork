@@ -31,6 +31,14 @@ class Sound(fileName: String, val fx: Boolean) {
     }
   }
   
+  def lose() = {
+    if(!muted) {
+      clip.start()
+    }
+  }
+  
+  def rewind() = clip.setFramePosition(0)
+  
   def loop() = {
     if (!muted) {
     clip.loop(Clip.LOOP_CONTINUOUSLY)
