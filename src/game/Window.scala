@@ -98,7 +98,7 @@ class Window extends PApplet {
         if ( this.game.isOn ) {
           this.game.changeGravity()
         } else if ( this.game.canStartNewGame ) { 
-          this.game.startGame()
+          this.game.startGame(frameCount)
         }
       }
       case 'q' => {

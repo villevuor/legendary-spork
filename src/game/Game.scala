@@ -4,6 +4,7 @@ import processing.core._
 import scala.collection.mutable.Buffer
 import scala.util.Random
 import scala.concurrent.duration._
+import scala.math._
 
 // Game class takes care of creating game objects, calculating their positions
 // and possible collisions between game elements. It also counts score and handles
@@ -26,6 +27,8 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   private var obstacles = Buffer[Obstacle]()
   private var taxiPositionY = 0 // upper left pixel of taxi
   private var currentLevel = 1
+  private var startFrame = 0
+  private var framesBeforeStart = 0
   
   def isOn = this.gameOn
   def isOver = this.gameOver
@@ -37,7 +40,8 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   def getObstacles() = this.obstacles
   def getTaxiPosition() = ( this.taxiPositionX, this.taxiPositionY )
   
-  def startGame(): Unit = {  
+  def startGame(frameCount: Int): Unit = {  
+    this.currentLevel = 1
     this.gameOn = true
     this.gameOver = false
     this.helpOn = false
@@ -45,8 +49,10 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     this.normalGravity = true
     this.obstacles = Buffer[Obstacle]()
     this.taxiPositionY = ( this.windowHeight / 2 ) - this.taxiHeight
-    this.currentLevel = 1
+    this.startFrame = frameCount
   }
+  
+  def gameFrame(frameCount: Int) = frameCount - this.startFrame + 1
   
   // Ends help and current game
   def endGame(): Unit = {
@@ -81,7 +87,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     this.obstacles = this.obstacles.filter( _.getPosition()._1 + this.obstacleWidth >= 0 )
     
     // Move taxi
-    var positionChange = 3
+    var positionChange = 5
     if ( !this.normalGravity ) {
       positionChange *= -1
     }
@@ -98,6 +104,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     
     // Count score
     this.score += 1
+
   }
   
   // Helper method fot checking taxi hits obstacle
@@ -130,8 +137,11 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   // Method that creates obstacles
   def createObstacles(frameCount: Int, orange: PImage, asteroid: PImage): Unit = {
     
-    // Obstacles are created every 2 seconds, but sometimes every 1 second
-    val create = ( frameCount % 120 == 0 || ( frameCount % 60 == 0 && Random.nextFloat < 0.3 ) )
+    // Every 4 seconds the interval between objects is shortened by one second, caps at four objects per second.
+    // In addition there's a 20% chance once a second to create an additional object. The chances of creating a random object
+    // increase by 0.01 every three seconds, capping at one additional object per second. To sum it up, after three minutes of gameplay
+    // there are 5 objects per second. You are doomed by then. Mwahahaha.
+    val create = ( this.gameFrame(frameCount) % max(15,(60 - this.gameFrame(frameCount) / 240))  == 0 || ( this.gameFrame(frameCount) % 60 == 0 && Random.nextFloat < min(1,(0.4 + 0.01 * (this.gameFrame(frameCount) / 180) ) ) ) )
     
     if ( create ) {
       val y = ( this.windowHeight * Random.nextFloat ) - ( this.obstacleHeight / 2 )
