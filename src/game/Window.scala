@@ -22,27 +22,32 @@ class Window extends PApplet {
   
   private val game = new Game(windowWidth, windowHeight)
   
-  var font: PFont = null
-  var taxi: PImage = null
-  var asteroid: PImage = null
-  var orange: PImage = null
-  var bonus: PImage = null
+  private var font: PFont = null
+  private var taxi: PImage = null
+  private var asteroid: PImage = null
+  private var orange: PImage = null
+  private var bonusBlock: PImage = null
   
+  // Set window size (method of processing library)
   override def settings () = {
     size(game.windowWidth, game.windowHeight)
   }
-  
+
+  // Set basic settings, load fonts and images (method of processing library)
   override def setup() = {
     smooth()
     frameRate(60)
     surface.setTitle("")
+    
     this.font = createFont("assets/MOZART_0.ttf", 32)
+    
     this.taxi = loadImage("assets/bus.png")
     this.asteroid = loadImage("assets/asteroid.png") 
     this.orange = loadImage("assets/orange.png")
-    this.bonus = loadImage("assets/bonuspoints.png")
+    this.bonusBlock = loadImage("assets/bonuspoints.png")
   }
   
+  // Called once per frame (method of processing library)
   override def draw() = {
     this.drawBackground()
     
@@ -53,13 +58,14 @@ class Window extends PApplet {
     } else if ( this.game.isOver ) {
       this.gameOverScreen()
     } else {
-      this.initScreen()
+      this.startScreen()
     }
   }
   
+  // Handle every key press event
   override def keyPressed() = {
     key match {
-      case ' ' => {
+      case ' ' => { // space
         if ( this.game.isOn ) {
           this.game.changeGravity()
         } else if ( this.game.canStartNewGame ) { 
@@ -82,11 +88,12 @@ class Window extends PApplet {
         game.toggleFx()
         game.commandFx.play()
       }
-      case _  => {}
+      case _  => {} // do nothing on other keys
     }
   }
   
-  def initScreen() = {    
+  // Displays start screen
+  private def startScreen() = {    
     game.introMusic.loop()
     
     textFont(this.font, 32)
@@ -108,8 +115,8 @@ class Window extends PApplet {
     text("Need help? Just press H", 40, this.windowHeight - 80)
   }
   
-  def helpScreen() = {
-    
+  // Show help screen
+  private def helpScreen() = {
     game.gameMusic.stop()
     game.introMusic.loop()
     
@@ -122,7 +129,8 @@ class Window extends PApplet {
     text( this.game.getHelpPage(), 40, 70)
   }
   
-  def gameOverScreen() = {    
+  // Show game over screen
+  private def gameOverScreen() = {    
     val half = this.windowWidth / 2
     
     game.gameMusic.stop()
@@ -145,25 +153,26 @@ class Window extends PApplet {
     }
   }
   
-  def gameScreen() = {
+  // Shows actual game. Called by gameScreen.
+  private def gameScreen() = {
     game.introMusic.stop()
     game.gameMusic.loop()
     
-    this.game.createObstacles( frameCount, this.orange, this.asteroid )
-    this.game.moveElements()
+    this.game.loop( frameCount, this.orange, this.asteroid )
     
     this.drawTaxi()
     this.drawObstacles()
     this.drawScore()
   }
   
-  // Get taxi position from game and draw it
-  def drawTaxi() = {
+  // Get taxi position from game and draw it. Called by gameScreen.
+  private def drawTaxi() = {
     val ( taxiX, taxiY ) = game.getTaxiPosition()
     image( this.taxi, taxiX, taxiY )
   }
   
-  def drawScore() = {
+  // Display player's current score. Called by gameScreen.
+  private def drawScore() = {
     textAlign(1)
     textSize(40)
     
@@ -174,14 +183,14 @@ class Window extends PApplet {
     }
     
     // f"${X}%08d" adds front zeros, looks better
-    text( f"${ this.game.getScore() }%08d", this.game.windowWidth - 140, 35 )
+    text( f"${ this.game.getScore() }%08d", this.game.windowWidth - 135, 35 )
   }
   
-  // Loop through all the obstacles from Game class and draw them in right positions
-  def drawObstacles() = {
-    for (obstacle <- this.game.getObstacles) {
-      val (x, y) = obstacle.getPosition()
-      val img = if ( this.game.isSpecialMode ) bonus else obstacle.image
+  // Loop through all the obstacles from Game class and draw them in right positions. Called by gameScreen. 
+  private def drawObstacles() = {
+    for ( obstacle <- this.game.getObstacles() ) {
+      val ( x, y ) = obstacle.getPosition()
+      val img = if ( this.game.isSpecialMode ) bonusBlock else obstacle.image
       image( img, x, y )
     }
   }
@@ -192,7 +201,7 @@ class Window extends PApplet {
   private var stars = Buffer[(Int, Int, Int)]() // (x, y, speed)
 
   // Draw background stars
-  def drawBackground() = {
+  private def drawBackground() = {
     
     if ( this.game.isSpecialMode ) {
       background(255, 203, 253)

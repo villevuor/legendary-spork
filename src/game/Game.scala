@@ -27,12 +27,10 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   private var normalGravity = true
   private var obstacles = Buffer[Obstacle]()
   private var taxiPositionY = 0 // upper left pixel of taxi
-  private var currentLevel = 1
   private var startFrame = 0
   private var framesBeforeStart = 0
   private var specialMode = 0
 
-  
   private var fxOn = true
   private var musicOn = true
   val sounds = Buffer[Sound]()
@@ -56,41 +54,39 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   
   // Toggles the music on and off
   def toggleMusic() = {
-    if (musicOn) {
-       sounds.filter(!_.fx).foreach( _.mute() ) // Mutes all the sounds that are categorized as music
+    if ( musicOn ) {
+       sounds.filter( !_.fx ).foreach( _.mute() ) // Mutes all the sounds that are categorized as music
        musicOn = false
-    }
-    else {
-      sounds.filter(!_.fx).foreach( _.unMute() ) // Unmutes
+    } else {
+      sounds.filter( !_.fx ).foreach( _.unMute() ) // Unmutes
       musicOn = true
     }
   }
   
   // Toggles the sound effects on and off
   def toggleFx() = {
-    if (fxOn) {
-      sounds.filter(_.fx).foreach( _.mute() ) // Mutes all the sounds that are categorized as effects
+    if ( fxOn ) {
+      sounds.filter( _.fx ).foreach( _.mute() ) // Mutes all the sounds that are categorized as effects
       fxOn = false
-    }
-    else {
-      sounds.filter(_.fx).foreach( _.unMute() ) // Unmutes
+    } else {
+      sounds.filter( _.fx ).foreach( _.unMute() ) // Unmutes
       fxOn = true
     }
   }
   
+  // "Get methods" for private vars
   def isOn = this.gameOn
   def isOver = this.gameOver
   def isHelp = this.helpOn
   def isNormalGravity = this.normalGravity
   def isSpecialMode = this.specialMode > 0
   def canStartNewGame = ( this.canStartNewGameTime == None || this.canStartNewGameTime.get.timeLeft < 0.seconds )
-  def getCurrentLevel() = this.currentLevel
   def getScore() = this.score
   def getObstacles() = this.obstacles
   def getTaxiPosition() = ( this.taxiPositionX, this.taxiPositionY )
   
+  // Resets all the game variables
   def startGame(frameCount: Int): Unit = {  
-    this.currentLevel = 1
     this.gameOn = true
     this.gameOver = false
     this.helpOn = false
@@ -99,11 +95,12 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     this.obstacles = Buffer[Obstacle]()
     this.taxiPositionY = ( this.windowHeight / 2 ) - this.taxiHeight
     this.startFrame = frameCount
-    this.currentLevel = 1
     this.specialMode = 0
+    
     this.startFx.play()
   }
   
+  // Calculates the frame number from beginning of single game
   def gameFrame(frameCount: Int) = frameCount - this.startFrame + 1
   
   // Ends help and current game
@@ -112,7 +109,6 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     this.gameOver = true
     this.canStartNewGameTime = Some( 1.seconds.fromNow )
     this.specialMode = 0
-    
     this.loseFx.play()
   }
   
@@ -132,8 +128,13 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     this.helpOn = !this.helpOn
   }
   
-  // Method for moving all the game elements (taxi + obstacles)
-  def moveElements(): Unit = {
+  // Method for general "game loop". When game is on, this is called once
+  // on every frame by Window class.
+  def loop(frameCount: Int, orange: PImage, asteroid: PImage): Unit = {
+
+    // Images (orange + asteroid) has to be forwarded to createObstacles
+    this.createObstacles(frameCount, orange, asteroid)
+    
     // Move obstacles
     for ( obstacle <- this.obstacles ) {
       obstacle.moveLeft()
@@ -148,7 +149,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     }
     this.taxiPositionY += positionChange
     
-    // Ends game if taxi is out of screen
+    // Ends game if taxi is out of screen (there is little margin that allows going out of screen)
     val taxiOutOfScreen = this.taxiPositionY < - this.taxiHeight / 2 || this.taxiPositionY > this.windowHeight - this.taxiHeight / 2
     if ( taxiOutOfScreen ) this.endGame()
    
@@ -168,14 +169,53 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     
     // Count score
     this.score += 1
-    this.specialMode = max( this.specialMode - 1, 0 )
     
-    if ( this.score % 500 == 0 ) {
-      this.currentLevel += 1
+    // If special mode, remove one frame from it's length
+    if ( this.specialMode > 0 ) this.specialMode -= 1
+  }
+  
+  // Method that creates obstacles. Is called once in every loop.
+  private def createObstacles(frameCount: Int, orange: PImage, asteroid: PImage): Unit = {
+    
+    // Obstacles are not created if special mode is ending soon
+    // Otherwise player would crash with rocket just after it was bonus block
+    if ( specialMode == 0 || specialMode >= 120 ) {
+      
+      // Every 4 seconds the interval between objects is shortened by one second,
+      // caps at four objects per second. In addition there's a 20% chance once
+      // a second to create an additional object. The chances of creating a random
+      // object increase by 0.01 every three seconds, capping at one additional
+      // object per second. To sum it up, after three minutes of gameplay there
+      // are 5 objects per second. You are doomed by then. Mwahahaha.
+      val shouldCreateObstacle = (
+        this.gameFrame(frameCount) % max( 15, ( 60 - this.gameFrame(frameCount) / 240 ) ) == 0 ||
+        (
+          this.gameFrame(frameCount) % 60 == 0 &&
+          Random.nextFloat < min( 1, ( 0.4 + 0.01 * ( this.gameFrame(frameCount) / 180 ) ) )
+        )
+      )
+      
+      if ( shouldCreateObstacle ) {
+        val y = ( this.windowHeight * Random.nextFloat ) - ( this.obstacleHeight / 2 )
+        
+        var image = asteroid
+        var action = () => this.endGame()
+        
+        // Every 20th obstacle is orange (average)
+        if ( Random.nextFloat < 0.05 ) {
+          image = orange 
+          action = () => {
+            this.specialMode = 600 // 10 seconds of special mode
+            this.modeFx.play()
+          }
+        }
+        
+        this.obstacles += new Obstacle( this.windowWidth, y.toInt, image, action )
+      }
     }
   }
   
-  // Helper method for checking taxi hits obstacle
+  // Helper method for checking if taxi hits obstacle
   private def taxiHitsObstacle(obstacle: Obstacle): Boolean = {
     val taxiPosition = this.getTaxiPosition()
     val ( x, y ) = obstacle.getPosition()
@@ -202,38 +242,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     pixel._2 < ( rectanglePosition._2 + rectangleHeight )
   )
   
-  // Method that creates obstacles
-  def createObstacles(frameCount: Int, orange: PImage, asteroid: PImage): Unit = {
-    
-    // Obstacles are created every 2 seconds and sometimes every 1 second
-    
-    //TÄÄ YLIMÄÄRÄNEN?? val create = ( frameCount % 120 == 0 || ( frameCount % 60 == 0 && Random.nextFloat < 0.3 ) )
-    
-    // Every 4 seconds the interval between objects is shortened by one second, caps at four objects per second.
-    // In addition there's a 20% chance once a second to create an additional object. The chances of creating a random object
-    // increase by 0.01 every three seconds, capping at one additional object per second. To sum it up, after three minutes of gameplay
-    // there are 5 objects per second. You are doomed by then. Mwahahaha.
-    val create = ( this.gameFrame(frameCount) % max(15,(60 - this.gameFrame(frameCount) / 240))  == 0 || ( this.gameFrame(frameCount) % 60 == 0 && Random.nextFloat < min(1,(0.4 + 0.01 * (this.gameFrame(frameCount) / 180) ) ) ) )
-    
-    if ( create ) {
-      val y = ( this.windowHeight * Random.nextFloat ) - ( this.obstacleHeight / 2 )
-      
-      var image = asteroid
-      var action = () => this.endGame()
-      
-      // Every 10th obstacle is orange (average)
-      if ( Random.nextFloat < 0.1 ) {
-        image = orange 
-        action = () => {
-          this.specialMode = 900 // 15 seconds of special mode
-          this.modeFx.play()
-        }
-      }
-      
-      this.obstacles += new Obstacle( this.windowWidth, y.toInt, image, action )
-    }
-  }
-  
+  // Return help page texts
   def getHelpPage(): String = {
     "\nWelcome to the legendary journey of the space bus!\n" +
     "How long can you travel without hitting the asteroids?\n" +
