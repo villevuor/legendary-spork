@@ -20,9 +20,7 @@ class Sound(fileName: String, val fx: Boolean) {
   }
   
   // Unmutes the sound
-  def unMute() = {
-    this.muted = false
-  }
+  def unMute() = this.muted = false
 
   // Plays the sound from the start if it is not muted
   def play() = {

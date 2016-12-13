@@ -23,8 +23,8 @@ class Window extends PApplet {
   private val game = new Game(windowWidth, windowHeight)
   
   private var font: PFont = null
-  private var taxi: PImage = null
-  private var asteroid: PImage = null
+  private var bus: PImage = null
+  private var rocket: PImage = null
   private var orange: PImage = null
   private var bonusBlock: PImage = null
   
@@ -41,8 +41,8 @@ class Window extends PApplet {
     
     this.font = createFont("assets/MOZART_0.ttf", 32)
     
-    this.taxi = loadImage("assets/bus.png")
-    this.asteroid = loadImage("assets/asteroid.png") 
+    this.bus = loadImage("assets/bus.png")
+    this.rocket = loadImage("assets/rocket.png") 
     this.orange = loadImage("assets/orange.png")
     this.bonusBlock = loadImage("assets/bonuspoints.png")
   }
@@ -158,17 +158,17 @@ class Window extends PApplet {
     game.introMusic.stop()
     game.gameMusic.loop()
     
-    this.game.loop( frameCount, this.orange, this.asteroid )
+    this.game.loop( frameCount, this.orange, this.rocket )
     
-    this.drawTaxi()
+    this.drawBus()
     this.drawObstacles()
     this.drawScore()
   }
   
-  // Get taxi position from game and draw it. Called by gameScreen.
-  private def drawTaxi() = {
-    val ( taxiX, taxiY ) = game.getTaxiPosition()
-    image( this.taxi, taxiX, taxiY )
+  // Get bus position from game and draw it. Called by gameScreen.
+  private def drawBus() = {
+    val ( busX, busY ) = game.getBusPosition()
+    image( this.bus, busX, busY )
   }
   
   // Display player's current score. Called by gameScreen.

@@ -13,11 +13,11 @@ import scala.math._
 
 class Game(val windowWidth: Int, val windowHeight: Int) {
   
-  val taxiWidth = 92
-  val taxiHeight = 58
+  val busWidth = 92
+  val busHeight = 58
   val obstacleWidth = 40
   val obstacleHeight = 45
-  val taxiPositionX = 20
+  val busPositionX = 20
   
   private var gameOn = false
   private var gameOver = false
@@ -26,7 +26,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   private var score = 0
   private var normalGravity = true
   private var obstacles = Buffer[Obstacle]()
-  private var taxiPositionY = 0 // upper left pixel of taxi
+  private var busPositionY = 0 // upper left pixel of bus
   private var startFrame = 0
   private var framesBeforeStart = 0
   private var specialMode = 0
@@ -83,7 +83,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   def canStartNewGame = ( this.canStartNewGameTime == None || this.canStartNewGameTime.get.timeLeft < 0.seconds )
   def getScore() = this.score
   def getObstacles() = this.obstacles
-  def getTaxiPosition() = ( this.taxiPositionX, this.taxiPositionY )
+  def getBusPosition() = ( this.busPositionX, this.busPositionY )
   
   // Resets all the game variables
   def startGame(frameCount: Int): Unit = {  
@@ -93,7 +93,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     this.score = 0
     this.normalGravity = true
     this.obstacles = Buffer[Obstacle]()
-    this.taxiPositionY = ( this.windowHeight / 2 ) - this.taxiHeight
+    this.busPositionY = ( this.windowHeight / 2 ) - this.busHeight
     this.startFrame = frameCount
     this.specialMode = 0
     
@@ -130,10 +130,10 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   
   // Method for general "game loop". When game is on, this is called once
   // on every frame by Window class.
-  def loop(frameCount: Int, orange: PImage, asteroid: PImage): Unit = {
+  def loop(frameCount: Int, orange: PImage, rocket: PImage): Unit = {
 
-    // Images (orange + asteroid) has to be forwarded to createObstacles
-    this.createObstacles(frameCount, orange, asteroid)
+    // Images (orange + rocket) has to be forwarded to createObstacles
+    this.createObstacles(frameCount, orange, rocket)
     
     // Move obstacles
     for ( obstacle <- this.obstacles ) {
@@ -142,20 +142,20 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     // Filter out obstacles that are not in screen anymore
     this.obstacles = this.obstacles.filter( _.getPosition()._1 + this.obstacleWidth >= 0 )
     
-    // Move taxi
+    // Move bus
     var positionChange = 5
     if ( !this.normalGravity ) {
       positionChange *= -1
     }
-    this.taxiPositionY += positionChange
+    this.busPositionY += positionChange
     
-    // Ends game if taxi is out of screen (there is little margin that allows going out of screen)
-    val taxiOutOfScreen = this.taxiPositionY < - this.taxiHeight / 2 || this.taxiPositionY > this.windowHeight - this.taxiHeight / 2
-    if ( taxiOutOfScreen ) this.endGame()
+    // Ends game if bus is out of screen (there is little margin that allows going out of screen)
+    val busOutOfScreen = this.busPositionY < - this.busHeight / 2 || this.busPositionY > this.windowHeight - this.busHeight / 2
+    if ( busOutOfScreen ) this.endGame()
    
-    // Check if taxi hits obstacle
+    // Check if bus hits obstacle
     this.obstacles.foreach( obstacle => {
-      if ( this.taxiHitsObstacle( obstacle ) ) {
+      if ( this.busHitsObstacle( obstacle ) ) {
         if ( this.isSpecialMode ) {
           this.score += 1000
           this.moneyFx.play()
@@ -164,8 +164,8 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
         }
       }
     })
-    // Filter out obstacles that hitted taxi
-    this.obstacles = this.obstacles.filterNot( this.taxiHitsObstacle( _ ) )
+    // Filter out obstacles that hitted bus
+    this.obstacles = this.obstacles.filterNot( this.busHitsObstacle( _ ) )
     
     // Count score
     this.score += 1
@@ -175,7 +175,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   }
   
   // Method that creates obstacles. Is called once in every loop.
-  private def createObstacles(frameCount: Int, orange: PImage, asteroid: PImage): Unit = {
+  private def createObstacles(frameCount: Int, orange: PImage, rocket: PImage): Unit = {
     
     // Obstacles are not created if special mode is ending soon
     // Otherwise player would crash with rocket just after it was bonus block
@@ -198,7 +198,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
       if ( shouldCreateObstacle ) {
         val y = ( this.windowHeight * Random.nextFloat ) - ( this.obstacleHeight / 2 )
         
-        var image = asteroid
+        var image = rocket
         var action = () => this.endGame()
         
         // Every 20th obstacle is orange (average)
@@ -215,9 +215,9 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     }
   }
   
-  // Helper method for checking if taxi hits obstacle
-  private def taxiHitsObstacle(obstacle: Obstacle): Boolean = {
-    val taxiPosition = this.getTaxiPosition()
+  // Helper method for checking if bus hits obstacle
+  private def busHitsObstacle(obstacle: Obstacle): Boolean = {
+    val busPosition = this.getBusPosition()
     val ( x, y ) = obstacle.getPosition()
     
     val obstacleBottomLeft = ( x, y )
@@ -225,12 +225,12 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     val obstacleTopLeft = ( x, y + this.obstacleHeight )
     val obstacleTopRight = ( x + this.obstacleWidth, y + this.obstacleHeight ) 
     
-    // Obstacles are smaller than taxi so we don't have to think about the case "obstacle covers taxi"
+    // Obstacles are smaller than bus so we don't have to think about the case "obstacle covers bus"
     (
-      this.pixelIsWithinRectangle( obstacleTopLeft, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
-      this.pixelIsWithinRectangle( obstacleTopRight, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
-      this.pixelIsWithinRectangle( obstacleBottomLeft, taxiPosition, this.taxiWidth, this.taxiHeight ) || 
-      this.pixelIsWithinRectangle( obstacleBottomRight, taxiPosition, this.taxiWidth, this.taxiHeight )
+      this.pixelIsWithinRectangle( obstacleTopLeft, busPosition, this.busWidth, this.busHeight ) || 
+      this.pixelIsWithinRectangle( obstacleTopRight, busPosition, this.busWidth, this.busHeight ) || 
+      this.pixelIsWithinRectangle( obstacleBottomLeft, busPosition, this.busWidth, this.busHeight ) || 
+      this.pixelIsWithinRectangle( obstacleBottomRight, busPosition, this.busWidth, this.busHeight )
     )
   }
   
@@ -245,7 +245,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
   // Return help page texts
   def getHelpPage(): String = {
     "\nWelcome to the legendary journey of the space bus!\n" +
-    "How long can you travel without hitting the asteroids?\n" +
+    "How long can you travel without hitting the rockets?\n" +
     "Oranges will send you to another dimension.\n\n" +
     "CONTROLS:\n\n" + 
     "SPACE: control the space bus\n" +
