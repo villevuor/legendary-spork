@@ -164,6 +164,7 @@ class Window extends PApplet {
   }
   
   def drawScore() = {
+    textAlign(1)
     textSize(40)
     
     if ( this.game.isSpecialMode ) {
@@ -172,8 +173,8 @@ class Window extends PApplet {
       fill(245, 208, 0)
     }
     
-    // f"${X}%07d" adds front zeros
-    text( f"${ this.game.getScore() }%07d", this.game.windowWidth - 120, 35 )
+    // f"${X}%08d" adds front zeros, looks better
+    text( f"${ this.game.getScore() }%08d", this.game.windowWidth - 140, 35 )
   }
   
   // Loop through all the obstacles from Game class and draw them in right positions

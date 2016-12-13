@@ -242,7 +242,7 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     "SPACE: control the space bus\n" +
     "Q: quit to start screen\n" +
     "M: mute sound\n" +
-    "F: mute FX\n\n" + 
+    "F: mute FX (sound effects)\n\n" + 
     "Sound effects from:\nopengameart.org/content/512-sound-effects-8-bit-style"
   }
   
