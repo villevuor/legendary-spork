@@ -72,7 +72,7 @@ class Window extends PApplet {
           this.game.startGame(frameCount)
         }
       }
-      case 'q' => {
+      case 'r' => {
         this.game.showStartScreen() // ends game or hides help page
         game.commandFx.play()
       }
@@ -148,7 +148,7 @@ class Window extends PApplet {
       fill(255)
       textSize(25)
       text("Press SPACE to start a new game", half, 310)
-      text("Press Q to show the start screen", half, 335)
+      text("Press R to return to the start screen", half, 335)
       text("Press H for help", half, 360)
     }
   }
