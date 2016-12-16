@@ -64,27 +64,27 @@ class Window extends PApplet {
   
   // Handle every key press event
   override def keyPressed() = {
-    key match {
-      case ' ' => { // space
+    key.toString.toLowerCase() match {
+      case " " => { // space
         if ( this.game.isOn ) {
           this.game.changeGravity()
         } else if ( this.game.canStartNewGame ) { 
           this.game.startGame(frameCount)
         }
       }
-      case 'r' => {
+      case "r" => {
         this.game.showStartScreen() // ends game or hides help page
         game.commandFx.play()
       }
-      case 'h' => {
+      case "h" => {
         this.game.toggleHelp()
         game.commandFx.play()
       }
-      case 'm' => {
+      case "m" => {
         game.toggleMusic()
         game.commandFx.play()
       }
-      case 'f' => {
+      case "f" => {
         game.toggleFx()
         game.commandFx.play()
       }
