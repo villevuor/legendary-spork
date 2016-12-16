@@ -242,17 +242,4 @@ class Game(val windowWidth: Int, val windowHeight: Int) {
     pixel._2 < ( rectanglePosition._2 + rectangleHeight )
   )
   
-  // Return help page texts
-  def getHelpPage(): String = {
-    "\nWelcome to the legendary journey of the space bus!\n" +
-    "How long can you travel without hitting the rockets?\n" +
-    "Oranges will send you to another dimension.\n\n" +
-    "CONTROLS:\n" + 
-    "SPACE: control the space bus\n" +
-    "R: return to start screen\n" +
-    "M: mute sound\n" +
-    "F: mute sound effects\n\n" + 
-    "Sound effects from:\nopengameart.org/content/512-sound-effects-8-bit-style"
-  }
-  
 }

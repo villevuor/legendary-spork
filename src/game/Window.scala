@@ -126,7 +126,19 @@ class Window extends PApplet {
     text("INSTRUCTIONS", 40, 40)
     fill(255)
     textSize(30)
-    text( this.game.getHelpPage(), 40, 70)
+    
+    val helpText =
+      "\nWelcome to the legendary journey of the space bus!\n" +
+      "How long can you travel without hitting the rockets?\n" +
+      "Oranges will send you to another dimension.\n\n" +
+      "CONTROLS:\n" + 
+      "SPACE: control the space bus\n" +
+      "R: return to start screen\n" +
+      "M: mute sound\n" +
+      "F: mute sound effects\n\n" + 
+      "Sound effects from:\nopengameart.org/content/512-sound-effects-8-bit-style"
+    
+    text( helpText, 40, 70)
   }
   
   // Show game over screen
